@@ -1,0 +1,10 @@
+#fourth-section {
+    min-height: 640px;
+    max-height: 800px !important;
+    
+    display: flex;
+    flex-wrap: wrap-reverse;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
