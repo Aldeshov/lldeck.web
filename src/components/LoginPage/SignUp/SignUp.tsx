@@ -1,13 +1,15 @@
+import { useDispatch } from "react-redux";
+import { Navigate, useNavigate } from "react-router";
+import { useContext, useReducer, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Alert, Box, Checkbox, FormControl, FormControlLabel, IconButton, InputAdornment, InputLabel, Link, OutlinedInput, Stack, Typography } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { useReducer, useState } from "react";
+import { SignInService, SignUpService } from "../../../services";
+import UserContext from "../../../contexts/UserContext";
 
-import APIRequest from "../../../services";
-import { useDispatch } from "react-redux";
 import './SignUp.css'
-import { useNavigate } from "react-router";
+
 
 class Status {
     public static IDLE = "IDLE";
@@ -18,8 +20,11 @@ class Status {
 
 interface State {
     name: string;
+    nameError: boolean;
     email: string;
+    emailError: boolean;
     password: string;
+    passwordError: boolean;
     showPassword: boolean;
     licenseAgreement: boolean;
 }
@@ -41,12 +46,14 @@ function Reducer(state: any, action: any) {
 
 const SignUp = () => {
     const navigate = useNavigate();
+    const { user } = useContext(UserContext);
     const globalDispatch = useDispatch();
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
     const [values, setValues] = useState<State>({
-        name: '',
-        email: '',
-        password: '',
+        name: '', nameError: false,
+        email: '', emailError: false,
+        password: '', passwordError: false,
         showPassword: true,
         licenseAgreement: false,
     });
@@ -58,7 +65,10 @@ const SignUp = () => {
     const handleChange =
         (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
             dispatch({ type: Status.IDLE });
-            setValues({ ...values, [prop]: event.target.value });
+            setValues({
+                ...values, [prop]: event.target.value,
+                nameError: false, emailError: false, passwordError: false
+            });
         };
 
     const handleClickShowPassword = () => {
@@ -82,26 +92,39 @@ const SignUp = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch({
-            type: values.licenseAgreement ? Status.Loading : Status.Error,
-            payload: values.licenseAgreement ? '' : "You need first to agree to LLDeck's Terms and Conditions!"
+        setValues({
+            ...values,
+            nameError: values.name === '',
+            emailError: values.email === '',
+            passwordError: values.password.length < 4
         });
 
-        if (values.licenseAgreement) {
+        if (!values.licenseAgreement) {
+            dispatch({
+                type: Status.Error,
+                payload: "You need first to agree to LLDeck's Terms and Conditions!"
+            });
+        }
+
+        if (values.licenseAgreement && values.name !== '' && values.email !== '' && values.password.length >= 4) {
             dispatch({ type: Status.Loading, payload: '' });
-            APIRequest<any>(`${process.env.REACT_APP_API_URL}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: values.name,
-                    email: values.email,
-                    password: values.password
-                })
-            })
-                .then(data => {
-                    dispatch({ type: Status.Successful, payload: "You are registered!" });
-                    globalDispatch({ type: 'PUT', payload: data.token })
-                    navigate('/', { replace: true })
+            SignUpService(values.name, values.email, values.password)
+                .then(async _data => {
+                    dispatch({ type: Status.Successful, payload: "You have been registered! Logging you in..." });
+                    await sleep(1000);
+                    SignInService(values.email, values.password)
+                        .then(async data => {
+                            dispatch({ type: Status.Successful, payload: "You are logged in" });
+                            await sleep(1000);
+                            globalDispatch({ type: 'PUT', payload: { isPermament: true, data: data.token } });
+                            navigate('/', { replace: true });
+                        })
+                        .catch((error: Error) => {
+                            dispatch({
+                                type: Status.Error,
+                                payload: error.message === 'Bad Request' ? "Username or password is incorrect" : error.message
+                            });
+                        })
                 })
                 .catch((error: Error) => {
                     globalDispatch({ type: 'DELETE' })
@@ -115,6 +138,11 @@ const SignUp = () => {
 
     return (
         <Stack id="signup-container" alignItems="center" justifyContent="center" spacing={5}>
+            {
+                user.valid && (
+                    <Navigate to="/" replace />
+                )
+            }
             <Typography variant="h5" component="h6">
                 Create your own account!
             </Typography>
@@ -136,6 +164,7 @@ const SignUp = () => {
                     <OutlinedInput
                         type='text'
                         id="nameInput"
+                        error={values.nameError}
                         disabled={state.loading}
                         inputProps={{
                             'aria-label': 'weight',
@@ -150,6 +179,7 @@ const SignUp = () => {
                     <OutlinedInput
                         type='email'
                         id="emailInput"
+                        error={values.emailError}
                         disabled={state.loading}
                         inputProps={{
                             'aria-label': 'weight',
@@ -164,6 +194,7 @@ const SignUp = () => {
                     <OutlinedInput
                         disabled={state.loading}
                         id="passwordInput"
+                        error={values.passwordError}
                         type={values.showPassword ? 'text' : 'password'}
                         value={values.password}
                         onChange={handleChange('password')}

@@ -1,5 +1,6 @@
 import { Divider, Link, Stack, Typography } from "@mui/material";
 
+
 const DefaultFooter = () => {
     return (
         <Stack

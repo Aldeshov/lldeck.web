@@ -7,11 +7,9 @@ const ThirdSection = () => {
     return (
         <Container id="third-section" maxWidth="xl">
             <Container maxWidth="sm" style={{ margin: 0 }}>
+                <h2>Your next success is not far off.</h2>
+                <br />
                 <Typography variant="body1" style={{ fontSize: '150%', maxWidth: 500 }}>
-                    <h2>
-                        Your next success is not far off.
-                    </h2>
-                    <br />
                     Each new fact that you remember is an achievement. LLDeck  breaks new material on the part to facilitate memorization and make mastering the material in the phased.
                 </Typography>
             </Container>

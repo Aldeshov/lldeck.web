@@ -7,11 +7,9 @@ const FifthSection = () => {
     return (
         <Container id="fifth-section" maxWidth="xl">
             <Container maxWidth="sm" style={{ margin: 0 }}>
+                <h2>Use your study time effectively!</h2>
+                <br />
                 <Typography variant="body1" style={{ fontSize: '150%', maxWidth: 500 }}>
-                    <h2>
-                        Use your study time effectively!
-                    </h2>
-                    <br />
                     Choose how many words you want to learn per day and move towards your goal with us!
                     Thanks to our technology, it will be twice as easy for you to memorize new words!
                 </Typography>
