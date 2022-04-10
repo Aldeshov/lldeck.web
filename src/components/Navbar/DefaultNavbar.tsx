@@ -24,7 +24,10 @@ const DefaultNavbar = () => {
                         </NavDropdown>
                     </Nav>
                     <Nav>
-                        <Nav.Link href="/login">Sign In</Nav.Link>
+                        <Nav.Link href="/login">
+                            Sign In
+                        </Nav.Link>
+
                         <Nav.Link eventKey={2} href="/register">
                             Sign Up
                         </Nav.Link>

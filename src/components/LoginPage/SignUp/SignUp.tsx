@@ -6,7 +6,8 @@ import { useReducer, useState } from "react";
 
 import APIRequest from "../../../services";
 import { useDispatch } from "react-redux";
-import './SignIn.css'
+import './SignUp.css'
+import { useNavigate } from "react-router";
 
 class Status {
     public static IDLE = "IDLE";
@@ -16,10 +17,11 @@ class Status {
 }
 
 interface State {
+    name: string;
     email: string;
     password: string;
-    rememberMe: boolean;
     showPassword: boolean;
+    licenseAgreement: boolean;
 }
 
 function Reducer(state: any, action: any) {
@@ -37,13 +39,16 @@ function Reducer(state: any, action: any) {
     }
 }
 
-const SignIn = () => {
-    // const globalDispatch = useDispatch();
+const SignUp = () => {
+    const navigate = useNavigate();
+    const globalDispatch = useDispatch();
+
     const [values, setValues] = useState<State>({
+        name: '',
         email: '',
         password: '',
-        rememberMe: false,
-        showPassword: false
+        showPassword: true,
+        licenseAgreement: false,
     });
 
     const [state, dispatch] = useReducer(Reducer, {
@@ -63,10 +68,11 @@ const SignIn = () => {
         });
     };
 
-    const handleClickRememberMe = () => {
+    const handleClickLicenseAgreement = () => {
+        dispatch({ type: Status.IDLE });
         setValues({
             ...values,
-            rememberMe: !values.rememberMe,
+            licenseAgreement: !values.licenseAgreement,
         });
     };
 
@@ -76,37 +82,45 @@ const SignIn = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch({ type: Status.Loading, payload: '' });
-        APIRequest<any>(`${process.env.REACT_APP_API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: values.email,
-                password: values.password
+        dispatch({
+            type: values.licenseAgreement ? Status.Loading : Status.Error,
+            payload: values.licenseAgreement ? '' : "You need first to agree to LLDeck's Terms and Conditions!"
+        });
+
+        if (values.licenseAgreement) {
+            dispatch({ type: Status.Loading, payload: '' });
+            APIRequest<any>(`${process.env.REACT_APP_API_URL}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: values.name,
+                    email: values.email,
+                    password: values.password
+                })
             })
-        })
-            .then(data => {
-                dispatch({ type: Status.Successful, payload: "You are logged in" });
-                // globalDispatch({ type: 'PUT', payload: data.token })
-                // navigate('/', { replace: true })
-            })
-            .catch((error: Error) => {
-                dispatch({
-                    type: Status.Error,
-                    payload: error.message === 'Bad Request' ? "Username or password is incorrect" : error.message
-                });
-            })
+                .then(data => {
+                    dispatch({ type: Status.Successful, payload: "You are registered!" });
+                    globalDispatch({ type: 'PUT', payload: data.token })
+                    navigate('/', { replace: true })
+                })
+                .catch((error: Error) => {
+                    globalDispatch({ type: 'DELETE' })
+                    dispatch({
+                        type: Status.Error,
+                        payload: error.message === 'Bad Request' ? "Entered email or password unacceptable!" : error.message
+                    });
+                })
+        }
     };
 
     return (
-        <Stack id="signin-container" alignItems="center" justifyContent="center" spacing={5}>
+        <Stack id="signup-container" alignItems="center" justifyContent="center" spacing={5}>
             <Typography variant="h5" component="h6">
-                Sign In
+                Create your own account!
             </Typography>
             <Box
                 component="form"
                 onSubmit={handleSubmit}
-                method="POST"
                 sx={{
                     width: '80%',
                     maxWidth: 750,
@@ -118,11 +132,25 @@ const SignIn = () => {
                 autoComplete="on"
             >
                 <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                    <InputLabel htmlFor="nameInput">Name</InputLabel>
+                    <OutlinedInput
+                        type='text'
+                        id="nameInput"
+                        disabled={state.loading}
+                        inputProps={{
+                            'aria-label': 'weight',
+                        }}
+                        value={values.name}
+                        onChange={handleChange('name')}
+                        label="Name"
+                    />
+                </FormControl>
+                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
                     <InputLabel htmlFor="emailInput">Email</InputLabel>
                     <OutlinedInput
-                        disabled={state.loading}
-                        id="emailInput"
                         type='email'
+                        id="emailInput"
+                        disabled={state.loading}
                         inputProps={{
                             'aria-label': 'weight',
                         }}
@@ -156,11 +184,11 @@ const SignIn = () => {
                 </FormControl>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" style={{ width: '90%' }}>
                     <FormControlLabel
-                        label="Remember me"
-                        control={<Checkbox disabled={state.loading} checked={values.rememberMe} onClick={handleClickRememberMe} />}
-                        style={{ color: '#999999' }} />
-                    <Link target="_blank" href="/restore" underline="none" >
-                        Forgot Password?
+                        label="I agree to LLDeck's Terms and Conditions*"
+                        control={<Checkbox disabled={state.loading} style={{ color: (state.error && !values.licenseAgreement) ? 'red' : '' }} checked={values.licenseAgreement} onClick={handleClickLicenseAgreement} />}
+                        style={{ color: (state.error && !values.licenseAgreement) ? 'red' : '#999999' }} />
+                    <Link target="_blank" href="/help" underline="none" >
+                        Need help?
                     </Link>
                 </Stack>
                 <Alert hidden={!state.error} severity="error" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
@@ -169,16 +197,16 @@ const SignIn = () => {
                 <Alert hidden={state.error || state.loading || !state.message} severity="success" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
                     {state.message}
                 </Alert>
-                <LoadingButton loading={state.loading} type="submit" variant="outlined" style={{ padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25 }}>Sign in</LoadingButton>
+                <LoadingButton loading={state.loading} type="submit" variant="outlined" style={{ padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25 }}>Sign up</LoadingButton>
                 <Typography variant="body1">
-                    New here?&nbsp;
-                    <Link href="/register" >
-                    Create a new account!
-                </Link>
+                    Already have an account?&nbsp;
+                    <Link href="/login" >
+                        Sign in
+                    </Link>
                 </Typography>
             </Box>
         </Stack>
     )
 }
 
-export default SignIn;
+export default SignUp;
