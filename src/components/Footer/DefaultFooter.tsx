@@ -1,4 +1,4 @@
-import { Divider, Link, Stack, Typography } from "@mui/material";
+import {Divider, Link, Stack, Typography} from "@mui/material";
 
 
 const DefaultFooter = () => {
@@ -7,8 +7,8 @@ const DefaultFooter = () => {
             direction="row"
             alignItems="center"
             justifyContent="space-between"
-            divider={<Divider orientation="vertical" flexItem />}
-            style={{ margin: 25 }}
+            divider={<Divider orientation="vertical" flexItem/>}
+            style={{margin: 25}}
             spacing={2}>
 
             <Typography variant="body1" component="div">
@@ -21,7 +21,7 @@ const DefaultFooter = () => {
 
             <Typography variant="body1" component="div">
                 Source code:&nbsp;
-                <Link target="_blank" href="https://github.com/Aldeshov/lldeck" underline="none" >
+                <Link target="_blank" href="https://github.com/Aldeshov/lldeck" underline="none">
                     GitHub
                 </Link>
             </Typography>

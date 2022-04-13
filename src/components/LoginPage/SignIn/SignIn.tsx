@@ -1,11 +1,24 @@
-import { useDispatch } from "react-redux";
-import { Navigate, useNavigate } from "react-router";
-import { useContext, useReducer, useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {useDispatch} from "react-redux";
+import {Navigate, useNavigate} from "react-router";
+import React, {useContext, useReducer, useState} from "react";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Alert, Box, Checkbox, FormControl, FormControlLabel, IconButton, InputAdornment, InputLabel, Link, OutlinedInput, Stack, Typography } from "@mui/material";
+import {
+    Alert,
+    Box,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    Link,
+    OutlinedInput,
+    Stack,
+    Typography
+} from "@mui/material";
 
-import { SignInService } from "../../../services";
+import {SignInService} from "../../../services";
 
 import './SignIn.css'
 import UserContext from "../../../contexts/UserContext";
@@ -29,13 +42,13 @@ interface State {
 function Reducer(state: any, action: any) {
     switch (action.type) {
         case Status.IDLE:
-            return { loading: false, error: false, message: '' };
+            return {loading: false, error: false, message: ''};
         case Status.Loading:
-            return { loading: true, error: false, message: 'Loading...' };
+            return {loading: true, error: false, message: 'Loading...'};
         case Status.Successful:
-            return { loading: false, error: false, message: action.payload };
+            return {loading: false, error: false, message: action.payload};
         case Status.Error:
-            return { loading: false, error: true, message: action.payload };
+            return {loading: false, error: true, message: action.payload};
         default:
             return state;
     }
@@ -44,7 +57,7 @@ function Reducer(state: any, action: any) {
 const SignIn = () => {
     const navigate = useNavigate();
     const globalDispatch = useDispatch();
-    const { user } = useContext(UserContext);
+    const {user} = useContext(UserContext);
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -62,8 +75,8 @@ const SignIn = () => {
 
     const handleChange =
         (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch({ type: Status.IDLE });
-            setValues({ ...values, [prop]: event.target.value, inputError: false });
+            dispatch({type: Status.IDLE});
+            setValues({...values, [prop]: event.target.value, inputError: false});
         };
 
     const handleClickShowPassword = () => {
@@ -92,13 +105,13 @@ const SignIn = () => {
         });
 
         if (values.email !== '' && values.password.length >= 4) {
-            dispatch({ type: Status.Loading, payload: '' });
+            dispatch({type: Status.Loading, payload: ''});
             SignInService(values.email, values.password)
                 .then(async data => {
-                    dispatch({ type: Status.Successful, payload: "You are logged in" });
+                    dispatch({type: Status.Successful, payload: "You are logged in"});
                     await sleep(1000);
-                    globalDispatch({ type: 'PUT', payload: { isPermament: values.rememberMe, data: data.token } })
-                    navigate('/', { replace: true })
+                    globalDispatch({type: 'PUT', payload: {isPermament: values.rememberMe, data: data.token}})
+                    navigate('/', {replace: true})
                 })
                 .catch((error: Error) => {
                     dispatch({
@@ -113,7 +126,7 @@ const SignIn = () => {
         <Stack id="signin-container" alignItems="center" justifyContent="center" spacing={5}>
             {
                 user.valid && (
-                    <Navigate to="/" replace />
+                    <Navigate to="/" replace/>
                 )
             }
             <Typography variant="h5" component="h6">
@@ -133,7 +146,7 @@ const SignIn = () => {
                 }}
                 autoComplete="on"
             >
-                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                <FormControl sx={{m: 1, width: '90%'}} variant="outlined">
                     <InputLabel htmlFor="emailInput">Email</InputLabel>
                     <OutlinedInput
                         type='email'
@@ -148,7 +161,7 @@ const SignIn = () => {
                         label="Email"
                     />
                 </FormControl>
-                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                <FormControl sx={{m: 1, width: '90%'}} variant="outlined">
                     <InputLabel htmlFor="passwordInput">Password</InputLabel>
                     <OutlinedInput
                         id="passwordInput"
@@ -165,32 +178,37 @@ const SignIn = () => {
                                     onMouseDown={handleMouseDownPassword}
                                     edge="end"
                                 >
-                                    {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                    {values.showPassword ? <VisibilityOff/> : <Visibility/>}
                                 </IconButton>
                             </InputAdornment>
                         }
                         label="Password"
                     />
                 </FormControl>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" style={{ width: '90%' }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" style={{width: '90%'}}>
                     <FormControlLabel
                         label="Remember me"
-                        control={<Checkbox disabled={state.loading} checked={values.rememberMe} onClick={handleClickRememberMe} />}
-                        style={{ color: '#999999' }} />
-                    <Link target="_blank" href="/restore" underline="none" >
+                        control={<Checkbox disabled={state.loading} checked={values.rememberMe}
+                                           onClick={handleClickRememberMe}/>}
+                        style={{color: '#999999'}}/>
+                    <Link target="_blank" href="/restore" underline="none">
                         Forgot Password?
                     </Link>
                 </Stack>
-                <Alert hidden={!state.error} severity="error" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
+                <Alert hidden={!state.error} severity="error"
+                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
                     {state.message}
                 </Alert>
-                <Alert hidden={state.error || state.loading || !state.message} severity="success" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
+                <Alert hidden={state.error || state.loading || !state.message} severity="success"
+                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
                     {state.message}
                 </Alert>
-                <LoadingButton loading={state.loading} type="submit" variant="outlined" style={{ padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25 }}>Sign in</LoadingButton>
+                <LoadingButton loading={state.loading} type="submit" variant="outlined"
+                               style={{padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25}}>Sign
+                    in</LoadingButton>
                 <Typography variant="body1">
                     New here?&nbsp;
-                    <Link href="/register" >
+                    <Link href="/register">
                         Create a new account!
                     </Link>
                 </Typography>

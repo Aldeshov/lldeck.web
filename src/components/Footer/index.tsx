@@ -1,3 +1,3 @@
 import DefaultFooter from "./DefaultFooter";
 
-export { DefaultFooter };
+export {DefaultFooter};

@@ -4,4 +4,4 @@ import ThirdSection from "./ThirdSection/ThirdSection";
 import FourthSection from "./FourthSection/FourthSection";
 import FifthSection from "./FifthSection/FifthSection";
 
-export { FirstSection, SecondSection, ThirdSection, FourthSection, FifthSection };
+export {FirstSection, SecondSection, ThirdSection, FourthSection, FifthSection};

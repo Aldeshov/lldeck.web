@@ -1,11 +1,24 @@
-import { useDispatch } from "react-redux";
-import { Navigate, useNavigate } from "react-router";
-import { useContext, useReducer, useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Alert, Box, Checkbox, FormControl, FormControlLabel, IconButton, InputAdornment, InputLabel, Link, OutlinedInput, Stack, Typography } from "@mui/material";
+import {useDispatch} from "react-redux";
+import {Navigate, useNavigate} from "react-router";
+import {useContext, useReducer, useState} from "react";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
+import {
+    Alert,
+    Box,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    Link,
+    OutlinedInput,
+    Stack,
+    Typography
+} from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { SignInService, SignUpService } from "../../../services";
+import {SignInService, SignUpService} from "../../../services";
 import UserContext from "../../../contexts/UserContext";
 
 import './SignUp.css'
@@ -32,13 +45,13 @@ interface State {
 function Reducer(state: any, action: any) {
     switch (action.type) {
         case Status.IDLE:
-            return { loading: false, error: false, message: '' };
+            return {loading: false, error: false, message: ''};
         case Status.Loading:
-            return { loading: true, error: false, message: 'Loading...' };
+            return {loading: true, error: false, message: 'Loading...'};
         case Status.Successful:
-            return { loading: false, error: false, message: action.payload };
+            return {loading: false, error: false, message: action.payload};
         case Status.Error:
-            return { loading: false, error: true, message: action.payload };
+            return {loading: false, error: true, message: action.payload};
         default:
             return state;
     }
@@ -46,7 +59,7 @@ function Reducer(state: any, action: any) {
 
 const SignUp = () => {
     const navigate = useNavigate();
-    const { user } = useContext(UserContext);
+    const {user} = useContext(UserContext);
     const globalDispatch = useDispatch();
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -64,7 +77,7 @@ const SignUp = () => {
 
     const handleChange =
         (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch({ type: Status.IDLE });
+            dispatch({type: Status.IDLE});
             setValues({
                 ...values, [prop]: event.target.value,
                 nameError: false, emailError: false, passwordError: false
@@ -79,7 +92,7 @@ const SignUp = () => {
     };
 
     const handleClickLicenseAgreement = () => {
-        dispatch({ type: Status.IDLE });
+        dispatch({type: Status.IDLE});
         setValues({
             ...values,
             licenseAgreement: !values.licenseAgreement,
@@ -107,17 +120,17 @@ const SignUp = () => {
         }
 
         if (values.licenseAgreement && values.name !== '' && values.email !== '' && values.password.length >= 4) {
-            dispatch({ type: Status.Loading, payload: '' });
+            dispatch({type: Status.Loading, payload: ''});
             SignUpService(values.name, values.email, values.password)
                 .then(async _data => {
-                    dispatch({ type: Status.Successful, payload: "You have been registered! Logging you in..." });
+                    dispatch({type: Status.Successful, payload: "You have been registered! Logging you in..."});
                     await sleep(1000);
                     SignInService(values.email, values.password)
                         .then(async data => {
-                            dispatch({ type: Status.Successful, payload: "You are logged in" });
+                            dispatch({type: Status.Successful, payload: "You are logged in"});
                             await sleep(1000);
-                            globalDispatch({ type: 'PUT', payload: { isPermament: true, data: data.token } });
-                            navigate('/', { replace: true });
+                            globalDispatch({type: 'PUT', payload: {isPermament: true, data: data.token}});
+                            navigate('/', {replace: true});
                         })
                         .catch((error: Error) => {
                             dispatch({
@@ -127,7 +140,7 @@ const SignUp = () => {
                         })
                 })
                 .catch((error: Error) => {
-                    globalDispatch({ type: 'DELETE' })
+                    globalDispatch({type: 'DELETE'})
                     dispatch({
                         type: Status.Error,
                         payload: error.message === 'Bad Request' ? "Entered email or password unacceptable!" : error.message
@@ -140,7 +153,7 @@ const SignUp = () => {
         <Stack id="signup-container" alignItems="center" justifyContent="center" spacing={5}>
             {
                 user.valid && (
-                    <Navigate to="/" replace />
+                    <Navigate to="/" replace/>
                 )
             }
             <Typography variant="h5" component="h6">
@@ -159,7 +172,7 @@ const SignUp = () => {
                 }}
                 autoComplete="on"
             >
-                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                <FormControl sx={{m: 1, width: '90%'}} variant="outlined">
                     <InputLabel htmlFor="nameInput">Name</InputLabel>
                     <OutlinedInput
                         type='text'
@@ -174,7 +187,7 @@ const SignUp = () => {
                         label="Name"
                     />
                 </FormControl>
-                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                <FormControl sx={{m: 1, width: '90%'}} variant="outlined">
                     <InputLabel htmlFor="emailInput">Email</InputLabel>
                     <OutlinedInput
                         type='email'
@@ -189,7 +202,7 @@ const SignUp = () => {
                         label="Email"
                     />
                 </FormControl>
-                <FormControl sx={{ m: 1, width: '90%' }} variant="outlined">
+                <FormControl sx={{m: 1, width: '90%'}} variant="outlined">
                     <InputLabel htmlFor="passwordInput">Password</InputLabel>
                     <OutlinedInput
                         disabled={state.loading}
@@ -206,32 +219,38 @@ const SignUp = () => {
                                     onMouseDown={handleMouseDownPassword}
                                     edge="end"
                                 >
-                                    {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                    {values.showPassword ? <VisibilityOff/> : <Visibility/>}
                                 </IconButton>
                             </InputAdornment>
                         }
                         label="Password"
                     />
                 </FormControl>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" style={{ width: '90%' }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" style={{width: '90%'}}>
                     <FormControlLabel
                         label="I agree to LLDeck's Terms and Conditions*"
-                        control={<Checkbox disabled={state.loading} style={{ color: (state.error && !values.licenseAgreement) ? 'red' : '' }} checked={values.licenseAgreement} onClick={handleClickLicenseAgreement} />}
-                        style={{ color: (state.error && !values.licenseAgreement) ? 'red' : '#999999' }} />
-                    <Link target="_blank" href="/help" underline="none" >
+                        control={<Checkbox disabled={state.loading}
+                                           style={{color: (state.error && !values.licenseAgreement) ? 'red' : ''}}
+                                           checked={values.licenseAgreement} onClick={handleClickLicenseAgreement}/>}
+                        style={{color: (state.error && !values.licenseAgreement) ? 'red' : '#999999'}}/>
+                    <Link target="_blank" href="/help" underline="none">
                         Need help?
                     </Link>
                 </Stack>
-                <Alert hidden={!state.error} severity="error" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
+                <Alert hidden={!state.error} severity="error"
+                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
                     {state.message}
                 </Alert>
-                <Alert hidden={state.error || state.loading || !state.message} severity="success" style={{ padding: 10, width: '90%', marginTop: 25, marginBottom: 25 }}>
+                <Alert hidden={state.error || state.loading || !state.message} severity="success"
+                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
                     {state.message}
                 </Alert>
-                <LoadingButton loading={state.loading} type="submit" variant="outlined" style={{ padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25 }}>Sign up</LoadingButton>
+                <LoadingButton loading={state.loading} type="submit" variant="outlined"
+                               style={{padding: 10, width: 200, borderRadius: 50, marginTop: 25, marginBottom: 25}}>Sign
+                    up</LoadingButton>
                 <Typography variant="body1">
                     Already have an account?&nbsp;
-                    <Link href="/login" >
+                    <Link href="/login">
                         Sign in
                     </Link>
                 </Typography>

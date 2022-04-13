@@ -1,3 +1,3 @@
 import defaultStore from "./DefaultStore";
 
-export { defaultStore };
+export {defaultStore};

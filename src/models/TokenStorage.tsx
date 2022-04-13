@@ -1,4 +1,4 @@
 export default interface TokenStorage {
-    isPermament: boolean;
+    isPermanent: boolean;
     data: string;
 }

@@ -1,4 +1,4 @@
-import { createStore } from "redux";
+import {createStore} from "redux";
 import TokenStorage from "../models/TokenStorage";
 
 
@@ -8,7 +8,7 @@ const tokenReducer = (state: any, action: any) => {
             return localStorage.getItem('Token') || sessionStorage.getItem('Token');
         case 'PUT':
             let payload = action.payload as TokenStorage;
-            if (payload.isPermament) localStorage.setItem('Token', payload.data);
+            if (payload.isPermanent) localStorage.setItem('Token', payload.data);
             else sessionStorage.setItem('Token', payload.data);
             return payload.data;
         case 'DELETE':
@@ -16,7 +16,7 @@ const tokenReducer = (state: any, action: any) => {
             sessionStorage.removeItem('Token');
             return '';
         default:
-            console.log(`TokenReducer 'default' access for: state(${state}), action(${action})`)
+            console.log(`TokenReducer 'default' access for: state(${JSON.stringify(state)}), action(${JSON.stringify(action)})`)
             return state;
     }
 }

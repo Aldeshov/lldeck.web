@@ -1,3 +1,3 @@
 import DefaultNavbar from "./DefaultNavbar"
 
-export { DefaultNavbar }
+export {DefaultNavbar}
