@@ -1,22 +1,43 @@
-import {Button, Container, Typography} from '@mui/material';
+import {Box, Button, Typography, useMediaQuery} from '@mui/material';
+import DrawingMini from './vectors/Drawing-2-mini.svg';
+import Drawing from './vectors/Drawing-2.svg';
 
-import './SecondSection.css'
 
 const SecondSection = () => {
+    const matches = useMediaQuery('(max-width:1256px)');
+    const buttonStyle: {} = {
+        marginBottom: 20,
+        borderRadius: 60,
+        padding: '16px 64px',
+        fontSize: 16,
+        marginTop: matches ? 20 : 0,
+        textTransform: 'none'
+    }
+
     return (
-        <Container id="second-section" maxWidth="xl">
-            <img src='/assets/images/main-page-2.png' style={{minWidth: '40%', maxWidth: '80%'}}
-                 alt="main page image number 2"/>
-            <Container maxWidth="sm" style={{margin: 0, maxWidth: 500}}>
-                <Typography variant="body1" style={{fontSize: '150%', maxWidth: 400}}>
-                    Achieve the best possible results. <br/> Step by step study any language.
-                </Typography>
-                <Button variant='contained' color='secondary'
-                        style={{margin: 20, borderRadius: 30, padding: 16, fontStyle: 'none'}}>
-                    Start to learn
-                </Button>
-            </Container>
-        </Container>
+        <Box className="main-section" style={{flexDirection: 'column', justifyContent: 'flex-start'}}>
+            {
+                !matches
+                    ?
+                    <img src={Drawing} style={{width: '90%', maxWidth: 1500, margin: '25px 25px 0 25px'}}
+                         alt="main page drawing-2"/>
+                    :
+                    <img src={DrawingMini} style={{width: '100%', maxWidth: 1080, margin: 0}}
+                         alt="main page drawing-2 mini"/>
+            }
+            {
+                matches && (
+                    <Typography variant='h6' style={{maxWidth: '90%', margin: 20, textAlign: 'center'}}>
+                        Achieve the best possible results
+                        <br/>
+                        Step by step study any language.
+                    </Typography>
+                )
+            }
+            <Button variant='contained' style={buttonStyle}>
+                Start to learn
+            </Button>
+        </Box>
     )
 }
 

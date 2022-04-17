@@ -1,21 +1,29 @@
-import {Container, Typography} from '@mui/material';
-
-import './FourthSection.css'
+import {Box, Container, Typography, useMediaQuery} from '@mui/material';
+import Drawing from './vectors/Drawing-4.svg';
 
 
 const FourthSection = () => {
+    const matches = useMediaQuery('(max-width:1256px)');
+
     return (
-        <Container id="fourth-section" maxWidth="xl">
-            <img src='/assets/images/main-page-4.png' style={{maxWidth: '80%'}} alt="main page image number 4"/>
-            <Container maxWidth="sm" style={{margin: 0}}>
-                <h2>Don't lose motivation.</h2>
+        <Box className="main-section wrap-reversed">
+            <Container maxWidth="sm" style={{margin: !matches ? 25 : 5}}>
+                {
+                    !matches
+                        ?
+                        <h1 style={{fontWeight: 700}}>Your next success is not far off.</h1>
+                        :
+                        <h2 style={{fontWeight: 700, color: '#4D5DFD'}}>Your next success is not far off.</h2>
+                }
                 <br/>
-                <Typography variant="body1" style={{fontSize: '150%', maxWidth: 500}}>
-                    Learn the material once and for all.
-                    When even a small amount of material covered feels like a victory, it motivates you to keep
-                    working. </Typography>
+                <Typography variant={!matches ? 'h5' : 'h6'} style={{maxWidth: !matches ? 555 : '90%'}}>
+                    Each new fact that you remember is an achievement. LLDeck breaks new material on the part to
+                    facilitate memorization and make mastering the material in the phased.
+                </Typography>
             </Container>
-        </Container>
+            <img src={Drawing} style={{width: matches ? '90%' : '45%', maxWidth: 512, margin: 25}}
+                 alt="main page drawing-1"/>
+        </Box>
     )
 }
 

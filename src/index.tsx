@@ -9,12 +9,16 @@ import App from './App';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
+import theme from "./configs/Theme";
+import {ThemeProvider} from "@mui/material";
 
 ReactDOM.render(
     <React.StrictMode>
         <Router>
             <Provider store={defaultStore}>
-                <App/>
+                <ThemeProvider theme={theme}>
+                    <App/>
+                </ThemeProvider>
             </Provider>
         </Router>
     </React.StrictMode>,

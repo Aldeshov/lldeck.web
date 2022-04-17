@@ -1,0 +1,36 @@
+.fullscreen-container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: block;
+    overflow: auto;
+}
+
+.main-section {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    padding: 25px;
+    min-height: 640px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    z-index: 250;
+}
+
+.wrap-reversed {
+    flex-wrap: wrap-reverse !important;
+}
+
+.link {
+    color: #4D5DFD;
+    user-select: none;
+    text-decoration: underline;
+}
+
+.link:hover {
+    color: #394af5;
+    cursor: pointer;
+}

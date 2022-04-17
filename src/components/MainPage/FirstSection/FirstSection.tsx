@@ -1,38 +1,40 @@
-import {Chip, Container, Grid, Link, Typography} from '@mui/material';
-import {AutoAwesomeOutlined} from '@mui/icons-material';
-
-import './FirstSection.css'
+import {Box, Button, Container, Typography, useMediaQuery} from '@mui/material';
+import Drawing from './vectors/Drawing-1.svg';
 
 
 const FirstSection = () => {
+    const matches = useMediaQuery('(max-width:1256px)');
+
+    const buttonStyle: {} = {
+        margin: 20,
+        borderRadius: 60,
+        padding: '16px 96px',
+        fontSize: 16,
+        textTransform: 'none'
+    }
+
     return (
-        <Container id="first-section" maxWidth="xl">
-            <Container maxWidth="sm">
-                <Typography variant="body1" style={{fontSize: '150%', maxWidth: 500}}>
-                    <Link href="/" underline="none">
-                        LLDeck
-                    </Link>
-                    &nbsp;─&nbsp;a program to facilitate the memorization of words, expressions and any other
-                    information using spaced repetitions.
+        <Box className="main-section" style={{backgroundColor: !matches ? '#E9EEFF' : 'white'}}>
+            <img src={Drawing} style={{width: matches ? '90%' : '45%', maxWidth: 512, margin: 25}}
+                 alt="main page drawing-1"/>
+            <Container maxWidth="sm" style={{margin: !matches ? 25 : 5}}>
+                {
+                    !matches
+                        ?
+                        <h1 style={{fontWeight: 700}}>Achieve the best possible results</h1>
+                        :
+                        <h2 style={{fontWeight: 700, color: '#4D5DFD'}}>Achieve the best possible results</h2>
+                }
+                <br/>
+                <Typography variant={!matches ? 'h5' : 'h6'} style={{maxWidth: !matches ? 555 : '90%'}}>
+                    Our program aim to facilitate the memorization of words, expressions and any other information using
+                    spaced repetitions.
                 </Typography>
-                <Grid container justifyContent="start" spacing={2} style={{marginTop: 16, marginBottom: 16}}>
-                    <Grid item>
-                        <Chip icon={<AutoAwesomeOutlined sx={{width: 20}}/>} label="Get Material" color="primary"
-                              style={{fontWeight: 500}}/>
-                    </Grid>
-                    <Grid item>
-                        <Chip icon={<AutoAwesomeOutlined sx={{width: 20}}/>} label="Study" color="primary"
-                              style={{fontWeight: 500}}/>
-                    </Grid>
-                    <Grid item>
-                        <Chip icon={<AutoAwesomeOutlined sx={{width: 20}}/>} label="See progress" color="primary"
-                              style={{fontWeight: 500}}/>
-                    </Grid>
-                </Grid>
+                <Button hidden={matches} variant='contained' style={buttonStyle}>
+                    Explore
+                </Button>
             </Container>
-            <img src='/assets/images/main-page-1.png' style={{minWidth: '40%', maxWidth: '80%'}}
-                 alt="main page image number 1"/>
-        </Container>
+        </Box>
     )
 }
 

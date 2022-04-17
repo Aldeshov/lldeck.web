@@ -1,4 +1,4 @@
-import {Divider, Link, Stack, Typography} from "@mui/material";
+import {Link, Stack, Typography} from "@mui/material";
 
 
 const DefaultFooter = () => {
@@ -6,8 +6,7 @@ const DefaultFooter = () => {
         <Stack
             direction="row"
             alignItems="center"
-            justifyContent="space-between"
-            divider={<Divider orientation="vertical" flexItem/>}
+            divider={<span>·</span>}
             style={{margin: 25}}
             spacing={2}>
 

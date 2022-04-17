@@ -1,16 +1,33 @@
-import {useContext} from "react";
 import {useDispatch} from "react-redux";
+import {Dispatch, FunctionComponent, SetStateAction, useContext, useEffect, useState} from "react";
+import {Button} from "@mui/material";
 import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {AccountCircle, Equalizer, Logout, Settings} from "@mui/icons-material";
-
 import UserContext from "../../contexts/UserContext";
 import Logo from './vectors/Logo.svg';
-import './DefaultNavbar.css';
 
 
-const DefaultNavbar = () => {
+const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
     const globalDispatch = useDispatch();
     const {user, setUser} = useContext(UserContext);
+    const [signInClicked, setSignInClicked] = useState<boolean>(false);
+    const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (signInClicked) {
+            props.setShow(1);
+            setSignInClicked(false);
+            setSignUpClicked(false);
+        }
+    }, [signInClicked]);
+
+    useEffect(() => {
+        if (signUpClicked) {
+            props.setShow(2);
+            setSignInClicked(false);
+            setSignUpClicked(false);
+        }
+    }, [signUpClicked]);
 
     const signOut = () => {
         setUser({valid: false, name: "", avatar: ""});
@@ -18,7 +35,7 @@ const DefaultNavbar = () => {
     };
 
     return (
-        <Navbar collapseOnSelect sticky="top" expand="lg" bg="light">
+        <Navbar collapseOnSelect sticky="top" expand="lg" bg="light" style={{boxShadow: '2px 2px 5px #D5D5D5'}}>
             <Container>
                 <Navbar.Brand href="/">
                     <img src={Logo} width={96} alt="logo"/>
@@ -29,12 +46,12 @@ const DefaultNavbar = () => {
                         <Nav.Link href="/library">Library</Nav.Link>
                         {
                             user.valid && (
-                                <Nav.Link href="/mydecks">My Decks</Nav.Link>
+                                <Nav.Link href="/my-decks">My Decks</Nav.Link>
                             )
                         }
                         {
                             user.valid && (
-                                <NavDropdown title="Profile" id="collasible-nav-dropdown">
+                                <NavDropdown title="Profile">
                                     <NavDropdown.Item href="/profile/settings"><Settings/> Settings</NavDropdown.Item>
                                     <NavDropdown.Item href="/profile/statistics"><Equalizer/> Statistics</NavDropdown.Item>
                                     <NavDropdown.Item href="/profile/info"><AccountCircle/> Information</NavDropdown.Item>
@@ -54,16 +71,30 @@ const DefaultNavbar = () => {
                         }
                         {
                             !user.valid && (
-                                <Nav.Link href="/login">
-                                    Sign In
-                                </Nav.Link>
+                                <Nav.Item>
+                                    <Button
+                                        aria-controls="fade-menu"
+                                        aria-haspopup="true"
+                                        aria-expanded="true"
+                                        style={{fontSize: 16, textTransform: 'none'}}
+                                        onClick={() => setSignInClicked(true)}>
+                                        Sign In
+                                    </Button>
+                                </Nav.Item>
                             )
                         }
                         {
                             !user.valid && (
-                                <Nav.Link href="/register">
-                                    Sign Up
-                                </Nav.Link>
+                                <Nav.Item>
+                                    <Button
+                                        aria-controls="fade-menu"
+                                        aria-haspopup="true"
+                                        aria-expanded="true"
+                                        style={{fontSize: 16, textTransform: 'none'}}
+                                        onClick={() => setSignUpClicked(true)}>
+                                        Sign Up
+                                    </Button>
+                                </Nav.Item>
                             )
                         }
                     </Nav>
