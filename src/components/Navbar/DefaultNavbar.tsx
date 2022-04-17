@@ -4,7 +4,7 @@ import {Button} from "@mui/material";
 import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {AccountCircle, Equalizer, Logout, Settings} from "@mui/icons-material";
 import UserContext from "../../contexts/UserContext";
-import Logo from './vectors/Logo.svg';
+import {ReactComponent as Logo} from './vectors/Logo.svg';
 
 
 const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
@@ -38,7 +38,7 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
         <Navbar collapseOnSelect sticky="top" expand="lg" bg="light" style={{boxShadow: '2px 2px 5px #D5D5D5'}}>
             <Container>
                 <Navbar.Brand href="/">
-                    <img src={Logo} width={96} alt="logo"/>
+                    <Logo />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                 <Navbar.Collapse id="responsive-navbar-nav">

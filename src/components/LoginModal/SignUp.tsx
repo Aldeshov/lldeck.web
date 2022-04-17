@@ -16,11 +16,14 @@ import {
     Modal,
     OutlinedInput,
     Paper,
+    Slide,
     Stack,
-    Typography
+    Typography,
+    useMediaQuery
 } from "@mui/material";
 
 import {SignInService, SignUpService} from "../../services";
+import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
 
 
 class Status {
@@ -58,16 +61,23 @@ function Reducer(state: any, action: any) {
 
 const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
     const globalDispatch = useDispatch();
+    const matches = useMediaQuery('(max-width:1256px)');
+    const [visible, setVisible] = useState<boolean>(false);
+
     const [signInClicked, setSignInClicked] = useState<boolean>(false);
 
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
     useEffect(() => {
-        if (signInClicked) {
-            props.setShow(1);
+        if (!visible && signInClicked) {
             setSignInClicked(false);
+            props.setShow(1);
         }
-    }, [signInClicked]);
+    }, [visible]);
+
+    useEffect(() => {
+        if (props.show) setVisible(true);
+    }, [props.show]);
 
     const [values, setValues] = useState<State>({
         name: '', nameError: false,
@@ -155,131 +165,164 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         }
     };
 
+    const form = (
+        <Paper elevation={4} style={{
+            borderRadius: 15,
+            padding: !matches ? 50 : '50px 20px',
+            background: 'rgb(249,252,251)',
+            position: 'relative'
+        }}>
+            {
+                matches && (
+                    <IconButton aria-label="delete" size="small"
+                                style={{position: "absolute", right: 25, top: 25}}
+                                onClick={() => props.setShow(0)}>
+                        <CloseIcon/>
+                    </IconButton>
+                )
+            }
+            <Stack alignItems="center" justifyContent="center" spacing={5}>
+                <Typography variant="h5" component="h6" style={{fontWeight: 700}}>
+                    Create your own account!
+                </Typography>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    sx={{
+                        width: '100%',
+                        maxWidth: 750,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'space-around'
+                    }}
+                    autoComplete="on"
+                >
+                    <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
+                        <InputLabel htmlFor="nameInput">Name</InputLabel>
+                        <OutlinedInput
+                            type='text'
+                            id="nameInput"
+                            error={values.nameError}
+                            disabled={state.loading}
+                            inputProps={{
+                                'aria-label': 'weight',
+                            }}
+                            value={values.name}
+                            onChange={handleChange('name')}
+                            label="Name"
+                        />
+                    </FormControl>
+                    <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
+                        <InputLabel htmlFor="emailInput">Email</InputLabel>
+                        <OutlinedInput
+                            type='email'
+                            id="emailInput"
+                            error={values.emailError}
+                            disabled={state.loading}
+                            inputProps={{
+                                'aria-label': 'weight',
+                            }}
+                            value={values.email}
+                            onChange={handleChange('email')}
+                            label="Email"
+                        />
+                    </FormControl>
+                    <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
+                        <InputLabel htmlFor="passwordInput">Password</InputLabel>
+                        <OutlinedInput
+                            disabled={state.loading}
+                            id="passwordInput"
+                            error={values.passwordError}
+                            type={values.showPassword ? 'text' : 'password'}
+                            value={values.password}
+                            onChange={handleChange('password')}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                        edge="end"
+                                    >
+                                        {values.showPassword ? <VisibilityOff/> : <Visibility/>}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                            label="Password"
+                        />
+                    </FormControl>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between"
+                           style={{width: '95%'}}>
+                        <FormControlLabel
+                            label="I agree to LLDeck's Terms and Conditions*"
+                            control={<Checkbox disabled={state.loading}
+                                               style={{color: (state.error && !values.licenseAgreement) ? 'red' : ''}}
+                                               checked={values.licenseAgreement}
+                                               onClick={handleClickLicenseAgreement}/>}
+                            style={{
+                                userSelect: 'none',
+                                textAlign: 'center',
+                                fontFamily: 'Manrope',
+                                color: (state.error && !values.licenseAgreement) ? 'red' : '#625C5C',
+                            }}/>
+                        <Link to="/help" style={{textDecoration: 'none', color: '#4D5DFD'}}>
+                            Need help?
+                        </Link>
+                    </Stack>
+                    <Alert hidden={!state.error} severity="error" elevation={1}
+                           style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
+                        {state.message}
+                    </Alert>
+                    <Alert hidden={state.error || state.loading || !state.message} severity="success"
+                           elevation={1}
+                           style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
+                        {state.message}
+                    </Alert>
+                    <LoadingButton loading={state.loading} type="submit" variant={!matches ? "outlined" : "contained"}
+                                   style={{
+                                       padding: 10,
+                                       fontSize: 16,
+                                       textTransform: 'none',
+                                       width: !matches ? 200 : 250,
+                                       borderRadius: 50,
+                                       marginTop: 75,
+                                       marginBottom: 25
+                                   }}>
+                        Sign up
+                    </LoadingButton>
+                    <Typography variant="body1" onClick={() => {
+                        setSignInClicked(true);
+                        props.setShow(0);
+                    }}>
+                        Already have an account?&nbsp;
+                        <span className="link">Sign In</span>
+                    </Typography>
+                </Box>
+            </Stack>
+        </Paper>
+    );
+
     return (
-        <Modal className="fullscreen-container" open={props.show} onClose={() => props.setShow(0)}>
-            <Box maxWidth={750} maxHeight={500} style={{margin: '5% auto'}}>
-                <Grow in={props.show}>
-                    <Paper elevation={4} style={{borderRadius: 15, padding: 50, background: 'rgb(249,252,251)'}}>
-                        <Stack alignItems="center" justifyContent="center" spacing={5}>
-                            <Typography variant="h5" component="h6" style={{fontWeight: 700}}>
-                                Create your own account!
-                            </Typography>
-                            <Box
-                                component="form"
-                                onSubmit={handleSubmit}
-                                sx={{
-                                    width: '100%',
-                                    maxWidth: 750,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-around'
-                                }}
-                                autoComplete="on"
-                            >
-                                <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
-                                    <InputLabel htmlFor="nameInput">Name</InputLabel>
-                                    <OutlinedInput
-                                        type='text'
-                                        id="nameInput"
-                                        error={values.nameError}
-                                        disabled={state.loading}
-                                        inputProps={{
-                                            'aria-label': 'weight',
-                                        }}
-                                        value={values.name}
-                                        onChange={handleChange('name')}
-                                        label="Name"
-                                    />
-                                </FormControl>
-                                <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
-                                    <InputLabel htmlFor="emailInput">Email</InputLabel>
-                                    <OutlinedInput
-                                        type='email'
-                                        id="emailInput"
-                                        error={values.emailError}
-                                        disabled={state.loading}
-                                        inputProps={{
-                                            'aria-label': 'weight',
-                                        }}
-                                        value={values.email}
-                                        onChange={handleChange('email')}
-                                        label="Email"
-                                    />
-                                </FormControl>
-                                <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
-                                    <InputLabel htmlFor="passwordInput">Password</InputLabel>
-                                    <OutlinedInput
-                                        disabled={state.loading}
-                                        id="passwordInput"
-                                        error={values.passwordError}
-                                        type={values.showPassword ? 'text' : 'password'}
-                                        value={values.password}
-                                        onChange={handleChange('password')}
-                                        endAdornment={
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={handleClickShowPassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    edge="end"
-                                                >
-                                                    {values.showPassword ? <VisibilityOff/> : <Visibility/>}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        }
-                                        label="Password"
-                                    />
-                                </FormControl>
-                                <Stack direction="row" alignItems="center" justifyContent="space-between"
-                                       style={{width: '95%'}}>
-                                    <FormControlLabel
-                                        label="I agree to LLDeck's Terms and Conditions*"
-                                        control={<Checkbox disabled={state.loading}
-                                                           style={{color: (state.error && !values.licenseAgreement) ? 'red' : ''}}
-                                                           checked={values.licenseAgreement}
-                                                           onClick={handleClickLicenseAgreement}/>}
-                                        style={{
-                                            userSelect: 'none',
-                                            textAlign: 'center',
-                                            fontFamily: 'Manrope',
-                                            color: (state.error && !values.licenseAgreement) ? 'red' : '#625C5C',
-                                        }}/>
-                                    <Link to="/help" style={{textDecoration: 'none', color: '#4D5DFD'}}>
-                                        Need help?
-                                    </Link>
-                                </Stack>
-                                <Alert hidden={!state.error} severity="error" elevation={1}
-                                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
-                                    {state.message}
-                                </Alert>
-                                <Alert hidden={state.error || state.loading || !state.message} severity="success"
-                                       elevation={1}
-                                       style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
-                                    {state.message}
-                                </Alert>
-                                <LoadingButton loading={state.loading} type="submit" variant="outlined"
-                                               style={{
-                                                   padding: 10,
-                                                   fontSize: 16,
-                                                   textTransform: 'none',
-                                                   width: 200,
-                                                   borderRadius: 50,
-                                                   marginTop: 25,
-                                                   marginBottom: 25
-                                               }}>
-                                    Sign up
-                                </LoadingButton>
-                                <Typography variant="body1" onClick={() => setSignInClicked(true)}>
-                                    Already have an account?&nbsp;
-                                    <span className="link">
-                                        Sign In
-                                    </span>
-                                </Typography>
-                            </Box>
-                        </Stack>
-                    </Paper>
-                </Grow>
+        <Modal className="fullscreen-container" open={visible} onClose={() => props.setShow(0)}
+               style={{display: matches ? 'flex' : ''}}>
+            <Box maxWidth={!matches ? 750 : 500} maxHeight={!matches ? 500 : 640}
+                 style={{margin: !matches ? '5% auto' : 'auto auto 0 auto', width: matches ? '100%' : ''}}>
+                {
+                    !matches
+                        ?
+                        <Grow in={props.show} mountOnEnter unmountOnExit
+                              onExited={() => setVisible(false)}
+                              onExit={() => props.setShow(0)}>
+                            {form}
+                        </Grow>
+                        :
+                        <Slide direction="up" in={props.show} mountOnEnter unmountOnExit
+                               onExited={() => setVisible(false)}
+                               onExit={() => props.setShow(0)}>
+                            {form}
+                        </Slide>
+                }
             </Box>
         </Modal>
     )

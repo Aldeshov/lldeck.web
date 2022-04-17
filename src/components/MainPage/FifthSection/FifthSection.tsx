@@ -6,7 +6,7 @@ const FifthSection = () => {
     const matches = useMediaQuery('(max-width:1256px)');
 
     return (
-        <Box className="main-section">
+        <Box className="main-section" style={{backgroundColor: !matches ? '#E9EEFF' : 'white'}}>
             <img src={Drawing} style={{maxWidth: '80%'}} alt="main page drawing-5"/>
             <Container maxWidth="sm" style={{margin: !matches ? 25 : 5}}>
                 {
