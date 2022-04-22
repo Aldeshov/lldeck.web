@@ -27,7 +27,7 @@ const App = () => {
 
     useEffect(() => {
         if (defaultStore) {
-            UserService(defaultStore)
+            UserService()
                 .then(data => {
                     setUser({
                         valid: true,
@@ -36,6 +36,7 @@ const App = () => {
                     });
                 })
                 .catch((error: Error) => {
+                    globalDispatch({type: 'DELETE'});
                     console.error(error);
                     setUser({
                         valid: false,

@@ -56,8 +56,9 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                                     <NavDropdown.Item href="/profile/statistics"><Equalizer/> Statistics</NavDropdown.Item>
                                     <NavDropdown.Item href="/profile/info"><AccountCircle/> Information</NavDropdown.Item>
                                     <NavDropdown.Divider/>
-                                    <NavDropdown.Item href="" onClick={(() => signOut())}><Logout/> Log
-                                        out</NavDropdown.Item>
+                                    <NavDropdown.Item href="" onClick={(() => signOut())}><Logout/>
+                                        Log out
+                                    </NavDropdown.Item>
                                 </NavDropdown>
                             )
                         }

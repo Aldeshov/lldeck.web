@@ -1,13 +1,7 @@
 import APIRequest from "./APIRequest";
 
-const UserService = (token: string) => {
-    return APIRequest<any>(`${process.env.REACT_APP_API_URL}/auth/profile`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `JWT ${token}`,
-            'Content-Type': 'application/json'
-        }
-    })
+const UserService = () => {
+    return APIRequest(`${process.env.REACT_APP_API_URL}/auth/profile`, "GET", new Headers(), null, true)
 }
 
 export default UserService;

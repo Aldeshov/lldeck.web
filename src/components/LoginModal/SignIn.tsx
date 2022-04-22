@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import React, {Dispatch, FunctionComponent, SetStateAction, useEffect, useReducer, useState} from "react";
+import React, {Dispatch, FunctionComponent, SetStateAction, useEffect, useState} from "react";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
@@ -9,6 +9,7 @@ import {
     Checkbox,
     FormControl,
     FormControlLabel,
+    FormHelperText,
     Grow,
     IconButton,
     InputAdornment,
@@ -23,36 +24,18 @@ import {
 } from "@mui/material";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
 import {SignInService} from "../../services";
+import RequestStatus from "../../models/RequestStatus";
+import {validateEmail, validatePassword} from "../../tools/validators";
+import {sleep} from "../../tools/extra";
+import ResponseError from "../../models/ResponseError";
 
-
-class Status {
-    public static IDLE = "IDLE";
-    public static Loading = "Loading";
-    public static Successful = "Successful";
-    public static Error = "Error";
-}
-
-interface State {
+interface InputState {
     email: string;
+    emailError: string;
     password: string;
-    inputError: boolean;
+    passwordError: string;
     rememberMe: boolean;
     showPassword: boolean;
-}
-
-function Reducer(state: any, action: any) {
-    switch (action.type) {
-        case Status.IDLE:
-            return {loading: false, error: false, message: ''};
-        case Status.Loading:
-            return {loading: true, error: false, message: 'Loading...'};
-        case Status.Successful:
-            return {loading: false, error: false, message: action.payload};
-        case Status.Error:
-            return {loading: false, error: true, message: action.payload};
-        default:
-            return state;
-    }
 }
 
 const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
@@ -60,8 +43,18 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     const matches = useMediaQuery('(max-width:1256px)');
     const [visible, setVisible] = useState<boolean>(false);
     const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
-
-    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+    const [useStateElement, setUseStateElement] = useState<{ status: RequestStatus, message: string }>({
+        status: RequestStatus.IDLE,
+        message: ""
+    })
+    const [values, setValues] = useState<InputState>({
+        email: "",
+        emailError: "",
+        password: "",
+        passwordError: "",
+        rememberMe: false,
+        showPassword: false
+    });
 
     useEffect(() => {
         if (props.show) setVisible(true);
@@ -74,22 +67,10 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         }
     }, [visible]);
 
-    const [values, setValues] = useState<State>({
-        email: '',
-        password: '',
-        inputError: false,
-        rememberMe: false,
-        showPassword: false
-    });
-
-    const [state, dispatch] = useReducer(Reducer, {
-        loading: false, error: false, message: ''
-    })
-
     const handleChange =
-        (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch({type: Status.IDLE});
-            setValues({...values, [prop]: event.target.value, inputError: false});
+        (prop: keyof InputState) => (event: React.ChangeEvent<HTMLInputElement>) => {
+            setValues({...values, [prop]: event.target.value, emailError: "", passwordError: ""});
+            setUseStateElement({status: RequestStatus.IDLE, message: ""});
         };
 
     const handleClickShowPassword = () => {
@@ -114,31 +95,38 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         event.preventDefault();
         setValues({
             ...values,
-            inputError: values.email === '' || values.password.length < 4,
+            emailError: !validateEmail(values.email) ? "Please enter valid email address" : "",
+            passwordError: !validatePassword(values.password) ? "Password too short" : "",
         });
 
-        if (values.email !== '' && values.password.length >= 4) {
-            dispatch({type: Status.Loading, payload: ''});
+        if (validateEmail(values.email) && validatePassword(values.password)) {
+            setUseStateElement({status: RequestStatus.LOADING, message: ""});
             SignInService(values.email, values.password)
-                .then(async data => {
-                    dispatch({type: Status.Successful, payload: "You are logged in"});
-                    await sleep(1000);
-                    globalDispatch({type: 'PUT', payload: {isPermanent: values.rememberMe, data: data.token}});
-                    props.setShow(0);
-                })
-                .catch((error: Error) => {
-                    dispatch({
-                        type: Status.Error,
-                        payload: error.message === 'Bad Request' ? "Username or password is incorrect" : error.message
-                    });
-                })
+                .then(
+                    async (data: any) => {
+                        setUseStateElement({status: RequestStatus.SUCCESSFUL, message: "You are signed in"});
+                        await sleep(1000);
+                        globalDispatch({type: 'PUT', payload: {isPermanent: values.rememberMe, data: data.token}});
+                        props.setShow(0);
+                    },
+                    (error: ResponseError) => {
+                        if (error.data) {
+                            if (error.data.non_field_errors) {
+                                let messages = "";
+                                for (let message of error.data.non_field_errors) messages += (message + "\n");
+                                setUseStateElement({status: RequestStatus.ERROR, message: messages});
+                                return;
+                            }
+                        }
+                        setUseStateElement({status: RequestStatus.ERROR, message: error.message});
+                    })
         }
     };
 
     const form = (
         <Paper elevation={4}
                style={{
-                   borderRadius: 15,
+                   borderRadius: !matches ? 15 : '15px 15px 0px 0px',
                    padding: !matches ? 50 : '50px 20px',
                    background: 'rgb(249,252,251)',
                    position: 'relative'
@@ -157,6 +145,8 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     Sign In
                 </Typography>
                 <Box
+                    noValidate
+                    method="post"
                     component="form"
                     onSubmit={handleSubmit}
                     sx={{
@@ -168,30 +158,30 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     }}
                     autoComplete="on"
                 >
-                    <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
+                    <FormControl error={!!values.emailError} sx={{m: 1, width: '100%'}} variant="outlined">
                         <InputLabel htmlFor="emailInput">Email</InputLabel>
                         <OutlinedInput
-                            type='email'
-                            id="emailInput"
-                            error={values.inputError}
-                            disabled={state.loading}
-                            inputProps={{
-                                'aria-label': 'weight',
-                            }}
-                            value={values.email}
-                            onChange={handleChange('email')}
+                            type="email"
                             label="Email"
+                            id="emailInput"
+                            value={values.email}
+                            disabled={useStateElement.status === RequestStatus.LOADING}
+                            onChange={handleChange('email')}
+                            inputProps={{'aria-label': 'weight'}}
+                            aria-describedby="emailError"
                         />
+                        <FormHelperText id="emailError">{values.emailError}</FormHelperText>
                     </FormControl>
-                    <FormControl sx={{m: 1, width: '100%'}} variant="outlined">
+                    <FormControl error={!!values.passwordError} sx={{m: 1, width: '100%'}} variant="outlined">
                         <InputLabel htmlFor="passwordInput">Password</InputLabel>
                         <OutlinedInput
+                            label="Password"
                             id="passwordInput"
-                            error={values.inputError}
-                            disabled={state.loading}
-                            type={values.showPassword ? 'text' : 'password'}
                             value={values.password}
+                            disabled={useStateElement.status === RequestStatus.LOADING}
                             onChange={handleChange('password')}
+                            aria-describedby="passwordError"
+                            type={values.showPassword ? 'text' : 'password'}
                             endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
@@ -204,14 +194,15 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                                     </IconButton>
                                 </InputAdornment>
                             }
-                            label="Password"
                         />
+                        <FormHelperText id="passwordError">{values.passwordError}</FormHelperText>
                     </FormControl>
                     <Stack direction="row" alignItems="center" justifyContent="space-between"
                            style={{width: '95%'}}>
                         <FormControlLabel
                             label="Remember me"
-                            control={<Checkbox disabled={state.loading} checked={values.rememberMe}
+                            control={<Checkbox disabled={useStateElement.status === RequestStatus.LOADING}
+                                               checked={values.rememberMe}
                                                onClick={handleClickRememberMe}/>}
                             style={{
                                 color: '#625C5C',
@@ -223,16 +214,19 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                             Forgot Password?
                         </Link>
                     </Stack>
-                    <Alert hidden={!state.error} severity="error" elevation={1}
-                           style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
-                        {state.message}
-                    </Alert>
-                    <Alert hidden={state.error || state.loading || !state.message} severity="success"
-                           elevation={1}
-                           style={{padding: 10, width: '90%', marginTop: 25, marginBottom: 25}}>
-                        {state.message}
-                    </Alert>
-                    <LoadingButton loading={state.loading} type="submit" variant={!matches ? "outlined" : "contained"}
+                    <Grow mountOnEnter unmountOnExit
+                          in={useStateElement.status === RequestStatus.ERROR || useStateElement.status === RequestStatus.SUCCESSFUL}>
+                        <Alert elevation={1}
+                               onClose={() => {
+                                   setUseStateElement({status: RequestStatus.IDLE, message: ""})
+                               }}
+                               severity={useStateElement.status === RequestStatus.SUCCESSFUL ? "success" : "error"}
+                               style={{padding: '10px 25px', width: '90%', marginTop: 25, marginBottom: 25}}>
+                            {useStateElement.message}
+                        </Alert>
+                    </Grow>
+                    <LoadingButton loading={useStateElement.status === RequestStatus.LOADING} type="submit"
+                                   variant={!matches ? "outlined" : "contained"}
                                    style={{
                                        padding: 10,
                                        fontSize: 16,
