@@ -18,9 +18,13 @@ import './App.css';
 const App = () => {
     const globalDispatch = useDispatch();
     const defaultStore = (useSelector(store => store) as string);
-    const [user, setUser] = useState<User>({valid: false, name: "", avatar: ""});
+    const [user, setUser] = useState<User>({
+        valid: true,
+        firstName: "Azat",
+        lastName: "",
+        avatar: "https://i.pinimg.com/originals/b9/30/a1/b930a1acad60630cefb07d8c1df819c4.jpg"
+    });
     const userState = useMemo(() => ({user, setUser}), [user]);
-
     const [signInUpWindow, setSignInUpWindow] = useState<number>(0);
 
     globalDispatch({type: 'GET'});
@@ -31,16 +35,17 @@ const App = () => {
                 .then(data => {
                     setUser({
                         valid: true,
-                        name: data.first_name + " " + data.last_name,
+                        firstName: data.first_name,
+                        lastName: data.last_name,
                         avatar: ""
                     });
                 })
-                .catch((error: Error) => {
+                .catch(() => {
                     globalDispatch({type: 'DELETE'});
-                    console.error(error);
                     setUser({
                         valid: false,
-                        name: "",
+                        firstName: "",
+                        lastName: "",
                         avatar: ""
                     });
                 })

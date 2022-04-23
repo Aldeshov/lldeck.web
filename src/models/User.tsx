@@ -1,5 +1,6 @@
 export default interface User {
     valid: boolean;
-    name: string;
+    firstName: string;
+    lastName: string;
     avatar: string;
 }

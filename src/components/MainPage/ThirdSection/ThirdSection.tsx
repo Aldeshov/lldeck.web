@@ -4,10 +4,10 @@ import Drawing from './vectors/Drawing-3.svg';
 
 
 const ThirdSection = () => {
-    const matches = useMediaQuery('(max-width:1256px)');
+    const matches = useMediaQuery('(max-width:1080px)');
 
     return (
-        <Box className="main-section" style={{backgroundColor: !matches ? '#E9EEFF' : 'white'}}>
+        <Box className="main-section" style={{backgroundColor: '#E9EEFF', padding: matches ? '50px 0' : ''}}>
             {
                 !matches
                     ?
@@ -23,10 +23,15 @@ const ThirdSection = () => {
                         ?
                         <h1 style={{fontWeight: 700}}>Don't lose motivation.</h1>
                         :
-                        <h2 style={{fontWeight: 700, color: '#4D5DFD'}}>Don't lose motivation.</h2>
+                        <h2 style={{fontWeight: 700, color: '#4D5DFD', textAlign: 'center'}}>Don't lose motivation.</h2>
                 }
                 <br/>
-                <Typography variant={!matches ? 'h5' : 'h6'} style={{maxWidth: !matches ? 555 : '90%'}}>
+                <Typography variant={!matches ? 'h5' : 'h6'}
+                            style={{
+                                maxWidth: !matches ? 555 : '100%',
+                                fontWeight: 400,
+                                textAlign: matches ? 'center' : 'unset'
+                            }}>
                     Learn the material once and for all.
                     When even a small amount of material covered feels like a victory, it motivates you to keep working.
                 </Typography>

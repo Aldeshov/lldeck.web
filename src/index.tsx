@@ -7,7 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import {defaultStore} from './stores';
 import App from './App';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import theme from "./configs/Theme";
 import {ThemeProvider} from "@mui/material";

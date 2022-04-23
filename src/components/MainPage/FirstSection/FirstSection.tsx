@@ -1,39 +1,47 @@
-import {Box, Button, Container, Typography, useMediaQuery} from '@mui/material';
+import {Box, Button, Typography, useMediaQuery} from '@mui/material';
 import Drawing from './vectors/Drawing-1.svg';
 
 
 const FirstSection = () => {
-    const matches = useMediaQuery('(max-width:1256px)');
-
-    const buttonStyle: {} = {
-        margin: 20,
-        borderRadius: 60,
-        padding: '16px 96px',
-        fontSize: 16,
-        textTransform: 'none'
-    }
+    const matches = useMediaQuery('(max-width:1080px)');
 
     return (
-        <Box className="main-section" style={{backgroundColor: !matches ? '#E9EEFF' : 'white'}}>
-            <img src={Drawing} style={{width: matches ? '90%' : '45%', maxWidth: 512, margin: 25}}
+        <Box className="main-section" style={{backgroundColor: '#E9EEFF'}}>
+            <img src={Drawing} style={{width: matches ? '80%' : '45%', maxWidth: 512, margin: 25}}
                  alt="main page drawing-1"/>
-            <Container maxWidth="sm" style={{margin: !matches ? 25 : 5}}>
+            <Box
+                style={{margin: !matches ? 25 : 5, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                 {
                     !matches
                         ?
                         <h1 style={{fontWeight: 700}}>Achieve the best possible results</h1>
                         :
-                        <h2 style={{fontWeight: 700, color: '#4D5DFD'}}>Achieve the best possible results</h2>
+                        <h2 style={{fontWeight: 700, color: '#4D5DFD', textAlign: 'center'}}>
+                            Achieve the best possible results
+                        </h2>
                 }
                 <br/>
-                <Typography variant={!matches ? 'h5' : 'h6'} style={{maxWidth: !matches ? 555 : '90%'}}>
+                <Typography variant={!matches ? 'h5' : 'h6'}
+                            style={{
+                                fontWeight: 400,
+                                maxWidth: !matches ? 555 : '100%',
+                                textAlign: matches ? 'center' : 'unset',
+                                padding: matches ? '0 20px' : ''
+                            }}>
                     Our program aim to facilitate the memorization of words, expressions and any other information using
                     spaced repetitions.
                 </Typography>
-                <Button hidden={matches} variant='contained' style={buttonStyle}>
+                <Button variant='contained' style={{
+                    fontSize: 16,
+                    maxWidth: 256,
+                    borderRadius: 60,
+                    padding: '16px 96px',
+                    textTransform: 'none',
+                    margin: matches ? '25px auto 50px' : 25,
+                }}>
                     Explore
                 </Button>
-            </Container>
+            </Box>
         </Box>
     )
 }

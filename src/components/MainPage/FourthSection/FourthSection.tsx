@@ -13,10 +13,16 @@ const FourthSection = () => {
                         ?
                         <h1 style={{fontWeight: 700}}>Your next success is not far off.</h1>
                         :
-                        <h2 style={{fontWeight: 700, color: '#4D5DFD'}}>Your next success is not far off.</h2>
+                        <h2 style={{fontWeight: 700, color: '#4D5DFD', textAlign: 'center'}}>Your next success is not
+                            far off.</h2>
                 }
                 <br/>
-                <Typography variant={!matches ? 'h5' : 'h6'} style={{maxWidth: !matches ? 555 : '90%'}}>
+                <Typography variant={!matches ? 'h5' : 'h6'}
+                            style={{
+                                fontWeight: 400,
+                                maxWidth: !matches ? 555 : '100%',
+                                textAlign: matches ? 'center' : 'unset'
+                            }}>
                     Each new fact that you remember is an achievement. LLDeck breaks new material on the part to
                     facilitate memorization and make mastering the material in the phased.
                 </Typography>
