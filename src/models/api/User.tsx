@@ -1,6 +1,8 @@
 export default interface User {
-    valid: boolean;
     firstName: string;
     lastName: string;
+    phoneNumber: number;
     avatar: string;
+    email: number;
+    aim: string;
 }

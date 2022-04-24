@@ -11,17 +11,17 @@ import {NotFound} from './components/NotFoundPage';
 
 import UserContext from './contexts/UserContext';
 import {UserService} from './services';
-import User from './models/User';
+import LocalUser from './models/LocalUser';
 
 import './App.css';
+import {Settings} from "./components/Settings";
 
 const App = () => {
     const globalDispatch = useDispatch();
     const defaultStore = (useSelector(store => store) as string);
-    const [user, setUser] = useState<User>({
-        valid: true,
-        firstName: "Azat",
-        lastName: "",
+    const [user, setUser] = useState<LocalUser>({
+        name: "Azat",
+        authorized: true,
         avatar: "https://i.pinimg.com/originals/b9/30/a1/b930a1acad60630cefb07d8c1df819c4.jpg"
     });
     const userState = useMemo(() => ({user, setUser}), [user]);
@@ -34,19 +34,17 @@ const App = () => {
             UserService()
                 .then(data => {
                     setUser({
-                        valid: true,
-                        firstName: data.first_name,
-                        lastName: data.last_name,
-                        avatar: ""
+                        avatar: "",
+                        authorized: true,
+                        name: data.first_name,
                     });
                 })
                 .catch(() => {
                     globalDispatch({type: 'DELETE'});
                     setUser({
-                        valid: false,
-                        firstName: "",
-                        lastName: "",
-                        avatar: ""
+                        name: "",
+                        avatar: "",
+                        authorized: false,
                     });
                 })
         }
@@ -55,29 +53,29 @@ const App = () => {
     return (
         <React.Fragment>
             <UserContext.Provider value={userState}>
+                {
+                    !user.authorized && (
+                        <Box>
+                            <SignIn show={signInUpWindow === 1} setShow={setSignInUpWindow}/>
+                            <SignUp show={signInUpWindow === 2} setShow={setSignInUpWindow}/>
+                        </Box>
+                    )
+                }
+                <DefaultNavbar setShow={setSignInUpWindow}/>
                 <Routes>
                     <Route path="/" element={
-                        <React.Fragment>
-                            {
-                                !user.valid && (
-                                    <Box>
-                                        <SignIn show={signInUpWindow === 1} setShow={setSignInUpWindow}/>
-                                        <SignUp show={signInUpWindow === 2} setShow={setSignInUpWindow}/>
-                                    </Box>
-                                )
-                            }
-                            <DefaultNavbar setShow={setSignInUpWindow}/>
-                            <Stack id="main" alignItems="center" justifyContent="space-around" spacing={8}>
-                                <FirstSection/>
-                                <SecondSection/>
-                                <ThirdSection/>
-                                <FourthSection/>
-                                <FifthSection/>
-                                <Divider flexItem/>
-                                <DefaultFooter/>
-                            </Stack>
-                        </React.Fragment>
+                        <Stack id="main" alignItems="center" justifyContent="space-around" spacing={8}
+                               sx={{backgroundColor: 'white'}}>
+                            <FirstSection/>
+                            <SecondSection/>
+                            <ThirdSection/>
+                            <FourthSection/>
+                            <FifthSection/>
+                            <Divider flexItem/>
+                            <DefaultFooter/>
+                        </Stack>
                     }/>
+                    <Route path="/user/settings" element={<Settings/>}/>
                     <Route path="/*" element={<NotFound/>}/>
                 </Routes>
             </UserContext.Provider>

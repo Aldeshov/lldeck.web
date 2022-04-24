@@ -8,7 +8,6 @@ import {
     ButtonProps,
     Container,
     Divider,
-    IconButton,
     ListItemIcon,
     ListItemText,
     Menu,
@@ -19,24 +18,21 @@ import {
     Typography
 } from "@mui/material";
 import {
-    AccountBox,
     AccountCircle,
-    AddBox,
+    BookOutlined,
     Equalizer,
-    Key,
     KeyboardArrowDown,
     KeyboardArrowUp,
-    Language,
     Logout,
-    Menu as MenuIcon,
-    Search as SearchIcon,
     Settings
 } from "@mui/icons-material";
 import UserContext from "../../contexts/UserContext";
-import {ReactComponent as Logo} from './vectors/Logo.svg';
+import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
 import {ReactComponent as OpenBook} from './vectors/OpenBook.svg';
 import {blue} from "@mui/material/colors";
-import User from "../../models/User";
+import {useNavigate} from "react-router";
+import {Link} from "react-router-dom";
+import {SearchInput} from "../../tools/custom";
 
 
 const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
@@ -45,15 +41,20 @@ const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
     boxShadow: 'none',
     '&:hover': {
         backgroundColor: '#d3d6ee',
+        boxShadow: 'none',
     },
+    '&:active': {
+        boxShadow: 'none'
+    }
 }));
 
+
 const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
+    const navigate = useNavigate();
     const globalDispatch = useDispatch();
     const {user, setUser} = useContext(UserContext);
     const [signInClicked, setSignInClicked] = useState<boolean>(false);
     const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
     useEffect(() => {
@@ -72,15 +73,9 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
         }
     }, [signUpClicked]);
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
+
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = () => {
@@ -88,7 +83,7 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
     };
 
     const signOut = () => {
-        setUser({valid: false, name: "", avatar: ""});
+        setUser({name: "", avatar: "", authorized: false});
         globalDispatch({type: 'DELETE'});
         handleCloseUserMenu();
     };
@@ -96,129 +91,31 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
     return (
         <AppBar elevation={2} position="sticky" sx={{backgroundColor: 'white'}}>
             <Container maxWidth="lg">
-                <Toolbar disableGutters>
+                <Toolbar disableGutters sx={{flexWrap: 'wrap'}}>
                     <Typography
                         noWrap
                         component="div"
-                        sx={{mr: 2, display: {xs: 'none', md: 'flex'}}}
-                    >
-                        <Logo/>
+                        sx={{flexGrow: !user.authorized ? 1 : 0, display: {xs: 'none', md: 'flex'}}}>
+                        <Link to="/" replace style={{display: 'flex', justifyContent: 'center'}}>
+                            <Logo/>
+                        </Link>
                     </Typography>
 
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                        >
-                            <MenuIcon/>
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{
-                                display: {xs: 'block', md: 'none'},
-                            }}
-                        >
-                            {
-                                user.valid && (
-                                    <MenuItem onClick={handleCloseNavMenu} sx={{width: 256}}>
-                                        <ListItemIcon>
-                                            <SearchIcon color="primary" sx={{width: 20, height: 20}}/>
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            Search
-                                        </ListItemText>
-                                    </MenuItem>
-                                )
-                            }
-
-                            {
-                                user.valid && (
-                                    <MenuItem onClick={handleCloseNavMenu} sx={{width: 256}}>
-                                        <ListItemIcon>
-                                            <OpenBook style={{width: 20, height: 20}}/>
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            Library
-                                        </ListItemText>
-                                    </MenuItem>
-                                )
-                            }
-
-                            {
-                                user.valid && (
-                                    <MenuItem onClick={handleCloseNavMenu} sx={{width: 256}}>
-                                        <ListItemIcon>
-                                            <AccountBox color="primary" sx={{width: 20, height: 20}}/>
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            My Decks
-                                        </ListItemText>
-                                    </MenuItem>
-                                )
-                            }
-
-                            {
-                                !user.valid && (
-                                    <MenuItem onClick={() => setSignInClicked(true)} sx={{width: 256}}>
-                                        <ListItemIcon>
-                                            <Key color="primary" sx={{width: 20, height: 20}}/>
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            Sign In
-                                        </ListItemText>
-                                    </MenuItem>
-                                )
-                            }
-
-                            {
-                                !user.valid && (
-                                    <MenuItem onClick={() => setSignUpClicked(true)} sx={{width: 256}}>
-                                        <ListItemIcon>
-                                            <AddBox color="primary" sx={{width: 20, height: 20}}/>
-                                        </ListItemIcon>
-                                        <ListItemText>
-                                            Sign Up
-                                        </ListItemText>
-                                    </MenuItem>
-                                )
-                            }
-                        </Menu>
-                    </Box>
                     <Typography
                         noWrap
                         component="div"
                         sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}
                     >
-                        <Logo/>
+                        <img src={LogoIcon} alt="logo" height="20"/>
                     </Typography>
 
                     {
-                        user.valid && (
+                        user.authorized && (
                             <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                                 <Button
-                                    onClick={handleCloseNavMenu}
-                                    startIcon={<SearchIcon color="primary"/>}
-                                    sx={{my: 2, display: 'flex', textTransform: 'none', color: '#323232'}}>
-                                    Search
-                                </Button>
-                                <Button
-                                    onClick={handleCloseNavMenu}
-                                    startIcon={<OpenBook/>}
+                                    onClick={() => {
+                                    }}
+                                    startIcon={<BookOutlined color="primary"/>}
                                     sx={{my: 2, display: 'flex', textTransform: 'none', marginLeft: 2, color: '#323232'}}>
                                     Library
                                 </Button>
@@ -227,53 +124,57 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                     }
 
                     {
-                        !user.valid && (
-                            <Box sx={{flexGrow: {xs: 0, md: 1}}}>
-                                <Button
-                                    onClick={handleCloseNavMenu}
-                                    startIcon={<Language color="secondary"/>}
-                                    sx={{my: 2, display: 'flex', textTransform: 'none'}}>
-                                    Explore
-                                </Button>
-                            </Box>
+                        !user.authorized && (
+                            <Button
+                                sx={{flexGrow: 0, margin: 1}}
+                                aria-controls="fade-menu"
+                                aria-haspopup="true"
+                                aria-expanded="true"
+                                style={{fontSize: 16, textTransform: 'none'}}
+                                onClick={() => setSignInClicked(true)}>
+                                Sign In
+                            </Button>
                         )
                     }
 
                     {
-                        !user.valid && (
-                            <Box sx={{flexGrow: 0, display: {xs: 'none', md: 'flex'}}}>
-                                <Button
-                                    aria-controls="fade-menu"
-                                    aria-haspopup="true"
-                                    aria-expanded="true"
-                                    style={{fontSize: 16, textTransform: 'none'}}
-                                    onClick={() => setSignInClicked(true)}>
-                                    Sign In
-                                </Button>
-                                <Button
-                                    aria-controls="fade-menu"
-                                    aria-haspopup="true"
-                                    aria-expanded="true"
-                                    style={{fontSize: 16, textTransform: 'none'}}
-                                    onClick={() => setSignUpClicked(true)}>
-                                    Sign Up
-                                </Button>
-                            </Box>
+                        !user.authorized && (
+                            <Divider orientation="vertical" color="secondary" flexItem sx={{margin: '20px 0'}}/>
                         )
                     }
 
                     {
-                        user.valid && (
-                            <Box sx={{flexGrow: 0, display: {xs: 'none', md: 'flex'}, marginRight: 1}}>
+                        !user.authorized && (
+                            <Button
+                                sx={{flexGrow: 0, margin: 1}}
+                                aria-controls="fade-menu"
+                                aria-haspopup="true"
+                                aria-expanded="true"
+                                style={{fontSize: 16, textTransform: 'none'}}
+                                onClick={() => setSignUpClicked(true)}>
+                                Sign Up
+                            </Button>
+                        )
+                    }
+
+                    {
+                        user.authorized && (
+                            <SearchInput sx={{display: {xs: 'none', md: 'flex'}, mr: 2}} placeholder="Search"/>
+                        )
+                    }
+
+                    {
+                        user.authorized && (
+                            <Box sx={{flexGrow: 0, marginRight: 1}}>
                                 <SpecialButton
-                                    onClick={handleCloseNavMenu}
+                                    onClick={() => {
+                                    }}
                                     variant="contained"
-                                    startIcon={<AccountBox color="primary"/>}
+                                    startIcon={<OpenBook/>}
                                     sx={{
                                         my: 2,
                                         display: 'flex',
                                         textTransform: 'none',
-                                        marginLeft: 2,
                                         color: '#323232',
                                         borderRadius: 25
                                     }}
@@ -285,20 +186,20 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                     }
 
                     {
-                        user.valid && (
+                        user.authorized && (
                             <Box sx={{flexGrow: 0}}>
-                                <Tooltip title="Open settings">
+                                <Tooltip title="Account">
                                     <Button onClick={handleOpenUserMenu}
                                             sx={{
                                                 textTransform: 'none',
                                                 color: '#323232',
-                                                padding: '10px 15px',
-                                                margin: '5px 0'
+                                                padding: '10px 12px',
+                                                margin: '5px 0',
                                             }}
-                                            startIcon={<Avatar sx={{width: 32, height: 32}} alt={user.firstName || "User"}
+                                            startIcon={<Avatar sx={{width: 32, height: 32}} alt={user.name || "User"}
                                                                src={user.avatar}/>}
                                             endIcon={!anchorElUser ? <KeyboardArrowDown/> : <KeyboardArrowUp/>}>
-                                        {user.firstName || "User"}
+                                        {user.name || "User"}
                                     </Button>
                                 </Tooltip>
                                 <Menu
@@ -327,7 +228,10 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                                             ⌘
                                         </Typography>
                                     </MenuItem>
-                                    <MenuItem onClick={handleCloseUserMenu} sx={{width: 320}}>
+                                    <MenuItem onClick={() => {
+                                        handleCloseUserMenu();
+                                        navigate('/user/settings', {replace: true});
+                                    }} sx={{width: 320}}>
                                         <ListItemIcon>
                                             <Settings sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
@@ -357,11 +261,22 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                                         <ListItemText>
                                             Log out
                                         </ListItemText>
-                                        <Typography variant="body2" color="text.secondary">
-                                            ⌘
-                                        </Typography>
                                     </MenuItem>
                                 </Menu>
+                            </Box>
+                        )
+                    }
+
+                    {
+                        user.authorized && (
+                            <Box sx={{
+                                flexGrow: 1,
+                                display: {xs: 'flex', md: 'none'},
+                                marginBottom: 2,
+                                width: '100%',
+                                justifyContent: 'center'
+                            }}>
+                                <SearchInput sx={{width: '90%'}} placeholder="Search"/>
                             </Box>
                         )
                     }

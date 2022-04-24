@@ -6,7 +6,7 @@ const NotFound = () => {
     const navigate = useNavigate();
 
     return (
-        <Stack alignItems="center" justifyContent="center" spacing={2} style={{minHeight: '100vh'}}>
+        <Stack alignItems="center" justifyContent="center" spacing={2} sx={{margin: '5%'}}>
             <img width={200} src={Warning} alt="warning"/>
             <Typography variant="h5" component="h6">
                 <Alert severity="warning" elevation={1}>
