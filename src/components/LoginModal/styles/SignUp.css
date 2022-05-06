@@ -1,0 +1,50 @@
+.react-tel-input .selected-flag:focus .arrow {
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top: 5px solid #4D5DFD
+}
+
+.react-tel-input .form-control {
+    background: transparent !important;
+    width: 100% !important;
+    user-focus: auto;
+}
+
+.react-tel-input {
+    user-focus: none;
+}
+
+.react-tel-input .form-control:focus {
+    border-color: #4D5DFD;
+    box-shadow: 0 0 0 1px #4D5DFD
+}
+
+.react-tel-input .form-control:focus + div:before {
+    color: #4D5DFD
+}
+
+.react-tel-input:focus > .special-label {
+    color: #4D5DFD !important;
+}
+
+.error .form-control {
+    border-color: #d50e0e;
+}
+
+.error .form-control:hover {
+    border-color: #d50e0e;
+    box-shadow: none;
+}
+
+.error .form-control:focus {
+    border-color: #d50e0e;
+    box-shadow: 0 0 0 1px #d50e0e
+}
+
+.error .form-control:focus + div:before {
+    color: #d50e0e
+}
+
+.error > .special-label {
+    color: #d50e0e !important;
+}

@@ -55,7 +55,7 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
     const {user, setUser} = useContext(UserContext);
     const [signInClicked, setSignInClicked] = useState<boolean>(false);
     const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
     useEffect(() => {
         if (signInClicked) {

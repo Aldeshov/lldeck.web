@@ -23,18 +23,22 @@ import {
     useMediaQuery
 } from "@mui/material";
 
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/material.css'
+import './styles/SignUp.css'
+
 import {SignInService, SignUpService} from "../../services";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
 import RequestStatus from "../../models/RequestStatus";
-import {validateEmail, validatePassword} from "../../tools/validators";
+import {validateEmail, validateName, validatePassword, validatePhoneNumber} from "../../tools/validators";
 import {sleep} from "../../tools/extra";
 import ResponseError from "../../models/ResponseError";
 
 interface InputState {
-    firstName: string;
-    firstNameError: string;
-    lastName: string;
-    lastNameError: string;
+    name: string;
+    nameError: string;
+    phoneNumber: string;
+    phoneNumberError: string;
     email: string;
     emailError: string;
     password: string;
@@ -56,12 +60,12 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     const [values, setValues] = useState<InputState>({
         email: '',
         emailError: "",
+        phoneNumber: "",
+        phoneNumberError: "",
         password: '',
         passwordError: "",
-        firstName: "",
-        firstNameError: "",
-        lastName: "",
-        lastNameError: "",
+        name: "",
+        nameError: "",
         showPassword: true,
         licenseAgreement: false,
     });
@@ -83,9 +87,9 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                 ...values,
                 [prop]: event.target.value,
                 emailError: "",
-                firstNameError: "",
-                lastNameError: "",
-                passwordError: ""
+                nameError: "",
+                passwordError: "",
+                phoneNumberError: ""
             });
             setUseStateElement({status: RequestStatus.IDLE, message: ""});
         };
@@ -105,26 +109,36 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         });
     };
 
+    const handlePhoneNumber = (value: string) => {
+        setValues({
+            ...values,
+            phoneNumber: value,
+            emailError: "",
+            nameError: "",
+            passwordError: "",
+            phoneNumberError: ""
+        });
+    }
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
 
     const allValid = (
         values.licenseAgreement &&
+        validateName(values.name) &&
         validateEmail(values.email) &&
         validatePassword(values.password) &&
-        values.firstName !== '' &&
-        values.lastName !== ''
+        validatePhoneNumber(values.phoneNumber)
     );
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
         setValues({
             ...values,
-            firstNameError: values.firstName === '' ? "Please enter the first name" : "",
-            lastNameError: values.lastName === '' ? "Please enter the last name" : "",
-            emailError: !validateEmail(values.email) ? "Please enter valid email address" : "",
+            nameError: !validateName(values.name) ? "Please enter the name" : "",
             passwordError: !validatePassword(values.password) ? "Password too short" : "",
+            emailError: !validateEmail(values.email) ? "Please enter valid email address" : "",
+            phoneNumberError: !validatePhoneNumber(values.phoneNumber) ? "Please enter the valid telephone" : "",
         });
 
         if (!values.licenseAgreement) {
@@ -136,7 +150,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
 
         if (allValid) {
             setUseStateElement({status: RequestStatus.LOADING, message: ""});
-            SignUpService(values.firstName, values.lastName, values.email, values.password)
+            SignUpService(values.name, values.phoneNumber, values.email, values.password)
                 .then(
                     async () => {
                         setUseStateElement({
@@ -152,7 +166,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                                     globalDispatch({type: 'PUT', payload: {isPermanent: true, data: data.token}});
                                     props.setShow(0);
                                 },
-                                (error: ResponseError) => {
+                                (error) => {
                                     if (error.data) {
                                         if (error.data.non_field_errors) {
                                             let messages = "";
@@ -207,33 +221,34 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     }}
                     autoComplete="on"
                 >
-                    <FormControl error={!!values.firstNameError} sx={{m: 1, width: '100%'}} variant="outlined">
-                        <InputLabel htmlFor="firstNameInput">First name</InputLabel>
+                    <FormControl error={!!values.nameError} sx={{m: 1, width: '100%'}} variant="outlined">
+                        <InputLabel htmlFor="nameInput">Name</InputLabel>
                         <OutlinedInput
                             type='text'
-                            label="First name"
-                            id="firstNameInput"
+                            label="Name"
+                            id="nameInput"
                             disabled={useStateElement.status === RequestStatus.LOADING}
                             inputProps={{'aria-label': 'weight'}}
-                            value={values.firstName}
-                            aria-describedby="firstNameError"
-                            onChange={handleChange('firstName')}
+                            value={values.name}
+                            aria-describedby="nameError"
+                            onChange={handleChange('name')}
                         />
-                        <FormHelperText id="firstNameError">{values.firstNameError}</FormHelperText>
+                        <FormHelperText id="firstNameError">{values.nameError}</FormHelperText>
                     </FormControl>
-                    <FormControl error={!!values.lastNameError} sx={{m: 1, width: '100%'}} variant="outlined">
-                        <InputLabel htmlFor="lastNameInput">Last name</InputLabel>
-                        <OutlinedInput
-                            type='text'
-                            label="Last name"
-                            id="lastNameInput"
-                            value={values.lastName}
-                            aria-describedby="lastNameError"
-                            inputProps={{'aria-label': 'weight'}}
-                            onChange={handleChange('lastName')}
+                    <FormControl error={!!values.phoneNumberError} sx={{m: 1, width: '100%'}} variant="outlined">
+                        <PhoneInput
+                            country={'us'}
+                            specialLabel="Telephone"
+                            value={values.phoneNumber}
+                            aria-describedby="phoneNumberError"
                             disabled={useStateElement.status === RequestStatus.LOADING}
+                            containerClass={values.phoneNumberError ? "error" : ''}
+                            inputProps={{
+                                required: true
+                            }}
+                            onChange={handlePhoneNumber}
                         />
-                        <FormHelperText id="lastNameError">{values.lastNameError}</FormHelperText>
+                        <FormHelperText id="phoneNumberError">{values.phoneNumberError}</FormHelperText>
                     </FormControl>
                     <FormControl error={!!values.emailError} sx={{m: 1, width: '100%'}} variant="outlined">
                         <InputLabel htmlFor="emailInput">Email</InputLabel>
@@ -275,7 +290,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                         <FormHelperText id="passwordError">{values.passwordError}</FormHelperText>
                     </FormControl>
                     <Stack direction="row" alignItems="center" justifyContent="space-between"
-                           style={{width: '95%'}}>
+                           style={{width: '100%'}}>
                         <FormControlLabel
                             label="I agree to LLDeck's Terms and Conditions*"
                             control={<Checkbox disabled={useStateElement.status === RequestStatus.LOADING}

@@ -198,7 +198,7 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                         <FormHelperText id="passwordError">{values.passwordError}</FormHelperText>
                     </FormControl>
                     <Stack direction="row" alignItems="center" justifyContent="space-between"
-                           style={{width: '95%'}}>
+                           style={{width: '100%'}}>
                         <FormControlLabel
                             label="Remember me"
                             control={<Checkbox disabled={useStateElement.status === RequestStatus.LOADING}

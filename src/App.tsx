@@ -19,14 +19,9 @@ import {Settings} from "./components/Settings";
 const App = () => {
     const globalDispatch = useDispatch();
     const defaultStore = (useSelector(store => store) as string);
-    const [user, setUser] = useState<LocalUser>({
-        name: "Azat",
-        authorized: true,
-        avatar: "https://i.pinimg.com/originals/b9/30/a1/b930a1acad60630cefb07d8c1df819c4.jpg"
-    });
+    const [user, setUser] = useState<LocalUser>({} as LocalUser);
     const userState = useMemo(() => ({user, setUser}), [user]);
     const [signInUpWindow, setSignInUpWindow] = useState<number>(0);
-
     globalDispatch({type: 'GET'});
 
     useEffect(() => {
@@ -34,9 +29,9 @@ const App = () => {
             UserService()
                 .then(data => {
                     setUser({
-                        avatar: "",
+                        name: data.name,
                         authorized: true,
-                        name: data.first_name,
+                        avatar: data.avatar,
                     });
                 })
                 .catch(() => {
@@ -48,7 +43,7 @@ const App = () => {
                     });
                 })
         }
-    }, [defaultStore]);
+    }, [defaultStore, globalDispatch]);
 
     return (
         <React.Fragment>
@@ -58,7 +53,7 @@ const App = () => {
                         <Box>
                             <SignIn show={signInUpWindow === 1} setShow={setSignInUpWindow}/>
                             <SignUp show={signInUpWindow === 2} setShow={setSignInUpWindow}/>
-                        </Box>
+                        </Box> /* Sign in and sign up popup widgets*/
                     )
                 }
                 <DefaultNavbar setShow={setSignInUpWindow}/>
@@ -73,7 +68,7 @@ const App = () => {
                             <FifthSection/>
                             <Divider flexItem/>
                             <DefaultFooter/>
-                        </Stack>
+                        </Stack> /* Collection of sections*/
                     }/>
                     <Route path="/user/settings" element={<Settings/>}/>
                     <Route path="/*" element={<NotFound/>}/>

@@ -106,8 +106,7 @@ const Settings = () => {
                     position: 'relative',
                     top: 150,
                     boxShadow: '0 0 8px #cccccc'
-                }} alt="Azat"
-                        src="https://i.pinimg.com/originals/b9/30/a1/b930a1acad60630cefb07d8c1df819c4.jpg"/>
+                }} alt="Azat" src="https://i.pinimg.com/originals/b9/30/a1/b930a1acad60630cefb07d8c1df819c4.jpg"/>
 
                 <Paper elevation={1} sx={{
                     width: '70%',
@@ -304,7 +303,8 @@ const Settings = () => {
             </Typography>
 
             <Box sx={{width: '100%', display: 'flex'}}>
-                <Button variant="contained" sx={{m: '20px auto', borderRadius: 25, padding: '10px 75px', textTransform: 'none'}}>
+                <Button variant="contained"
+                        sx={{m: '20px auto', borderRadius: 25, padding: '10px 75px', textTransform: 'none'}}>
                     Save
                 </Button>
             </Box>
