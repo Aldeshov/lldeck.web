@@ -43,6 +43,8 @@ interface InputState {
     emailError: string;
     password: string;
     passwordError: string;
+    confirmPassword: string;
+    confirmPasswordError: string;
     showPassword: boolean;
     licenseAgreement: boolean;
 }
@@ -58,15 +60,17 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         message: ""
     })
     const [values, setValues] = useState<InputState>({
+        name: "",
+        nameError: "",
         email: '',
         emailError: "",
         phoneNumber: "",
         phoneNumberError: "",
         password: '',
         passwordError: "",
-        name: "",
-        nameError: "",
-        showPassword: true,
+        confirmPassword: "",
+        confirmPasswordError: "",
+        showPassword: false,
         licenseAgreement: false,
     });
 
@@ -89,6 +93,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                 emailError: "",
                 nameError: "",
                 passwordError: "",
+                confirmPasswordError: "",
                 phoneNumberError: ""
             });
             setUseStateElement({status: RequestStatus.IDLE, message: ""});
@@ -116,6 +121,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
             emailError: "",
             nameError: "",
             passwordError: "",
+            confirmPasswordError: "",
             phoneNumberError: ""
         });
     }
@@ -128,7 +134,8 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         validateName(values.name) &&
         validateEmail(values.email) &&
         validatePassword(values.password) &&
-        validatePhoneNumber(values.phoneNumber)
+        validatePhoneNumber(values.phoneNumber) &&
+        values.confirmPassword === values.password
     );
 
     const handleSubmit = (event: any) => {
@@ -136,8 +143,9 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
         setValues({
             ...values,
             nameError: !validateName(values.name) ? "Please enter the name" : "",
-            passwordError: !validatePassword(values.password) ? "Password too short" : "",
             emailError: !validateEmail(values.email) ? "Please enter valid email address" : "",
+            passwordError: !validatePassword(values.password) ? "Password too short" : "",
+            confirmPasswordError: values.confirmPassword !== values.password ? "Please make sure that the passwords match" : "",
             phoneNumberError: !validatePhoneNumber(values.phoneNumber) ? "Please enter the valid telephone" : "",
         });
 
@@ -150,7 +158,9 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
 
         if (allValid) {
             setUseStateElement({status: RequestStatus.LOADING, message: ""});
-            SignUpService(values.name, values.phoneNumber, values.email, values.password)
+            SignUpService(values.name, `+${values.phoneNumber}`,
+                values.email, values.password, values.confirmPassword
+            )
                 .then(
                     async () => {
                         setUseStateElement({
@@ -158,7 +168,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                             message: "You have been registered! Logging you in..."
                         });
                         await sleep(1000);
-                        SignInService(values.email, values.password)
+                        SignInService(values.email, values.confirmPassword, true)
                             .then(
                                 async (data: any) => {
                                     setUseStateElement({status: RequestStatus.LOADING, message: "You are logged in"});
@@ -168,20 +178,44 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                                 },
                                 (error) => {
                                     if (error.data) {
-                                        if (error.data.non_field_errors) {
-                                            let messages = "";
-                                            for (let message of error.data.non_field_errors) messages += (message + "\n");
-                                            setUseStateElement({status: RequestStatus.ERROR, message: messages});
-                                            return;
-                                        }
+                                        setValues({
+                                            ...values,
+                                            emailError: error.data.email || "",
+                                            passwordError: error.data.password || "",
+                                        });
+                                        setUseStateElement({
+                                            status: RequestStatus.ERROR,
+                                            message: error.data.__all__ || error.message
+                                        });
+                                    } else {
+                                        setUseStateElement({
+                                            status: RequestStatus.ERROR,
+                                            message: error.message
+                                        });
                                     }
-                                    setUseStateElement({status: RequestStatus.ERROR, message: error.message});
                                 })
                     },
                     (error: ResponseError) => {
-                        console.log(error)
                         globalDispatch({type: 'DELETE'});
-                        setUseStateElement({status: RequestStatus.ERROR, message: error.message});
+                        if (error.data) {
+                            setValues({
+                                ...values,
+                                nameError: error.data.name || "",
+                                emailError: error.data.email || "",
+                                phoneNumberError: error.data.phone_number || "",
+                                passwordError: error.data.password1 || "",
+                                confirmPasswordError: error.data.password2 || ""
+                            })
+                            setUseStateElement({
+                                status: RequestStatus.ERROR,
+                                message: error.message == 'Bad Request' ? 'Invalid data, please correct them' : error.message
+                            });
+                        } else {
+                            setUseStateElement({
+                                status: RequestStatus.ERROR,
+                                message: error.message
+                            });
+                        }
                     })
         }
     };
@@ -288,6 +322,19 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                             }
                         />
                         <FormHelperText id="passwordError">{values.passwordError}</FormHelperText>
+                    </FormControl>
+                    <FormControl error={!!values.confirmPasswordError} sx={{m: 1, width: '100%'}} variant="outlined">
+                        <InputLabel htmlFor="confirmPasswordInput">Confirm password</InputLabel>
+                        <OutlinedInput
+                            label="Confirm password"
+                            id="confirmPasswordInput"
+                            value={values.confirmPassword}
+                            aria-describedby="confirmPasswordError"
+                            type={values.showPassword ? 'text' : 'password'}
+                            onChange={handleChange('confirmPassword')}
+                            disabled={useStateElement.status === RequestStatus.LOADING}
+                        />
+                        <FormHelperText id="confirmPasswordError">{values.confirmPasswordError}</FormHelperText>
                     </FormControl>
                     <Stack direction="row" alignItems="center" justifyContent="space-between"
                            style={{width: '100%'}}>

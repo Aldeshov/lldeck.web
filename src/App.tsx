@@ -31,10 +31,11 @@ const App = () => {
                     setUser({
                         name: data.name,
                         authorized: true,
-                        avatar: data.avatar,
+                        avatar: `${process.env.REACT_APP_API_URL}${data.avatar}`,
                     });
                 })
-                .catch(() => {
+                .catch((error) => {
+                    console.log(error)
                     globalDispatch({type: 'DELETE'});
                     setUser({
                         name: "",

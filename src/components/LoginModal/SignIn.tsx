@@ -101,7 +101,7 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
 
         if (validateEmail(values.email) && validatePassword(values.password)) {
             setUseStateElement({status: RequestStatus.LOADING, message: ""});
-            SignInService(values.email, values.password)
+            SignInService(values.email, values.password, values.rememberMe)
                 .then(
                     async (data: any) => {
                         setUseStateElement({status: RequestStatus.SUCCESSFUL, message: "You are signed in"});
@@ -111,14 +111,21 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     },
                     (error: ResponseError) => {
                         if (error.data) {
-                            if (error.data.non_field_errors) {
-                                let messages = "";
-                                for (let message of error.data.non_field_errors) messages += (message + "\n");
-                                setUseStateElement({status: RequestStatus.ERROR, message: messages});
-                                return;
-                            }
+                            setValues({
+                                ...values,
+                                emailError: error.data.email || "",
+                                passwordError: error.data.password || "",
+                            });
+                            setUseStateElement({
+                                status: RequestStatus.ERROR,
+                                message: error.data.__all__ || error.message
+                            });
+                        } else {
+                            setUseStateElement({
+                                status: RequestStatus.ERROR,
+                                message: error.message
+                            });
                         }
-                        setUseStateElement({status: RequestStatus.ERROR, message: error.message});
                     })
         }
     };
