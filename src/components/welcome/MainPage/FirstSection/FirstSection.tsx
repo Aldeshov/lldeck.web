@@ -1,8 +1,10 @@
 import {Box, Button, Typography, useMediaQuery} from '@mui/material';
 import Drawing from './vectors/Drawing-1.svg';
+import {useNavigate} from "react-router";
 
 
 const FirstSection = () => {
+    const navigate = useNavigate();
     const matches = useMediaQuery('(max-width:1080px)');
 
     return (
@@ -31,7 +33,9 @@ const FirstSection = () => {
                     Our program aim to facilitate the memorization of words, expressions and any other information using
                     spaced repetitions.
                 </Typography>
-                <Button variant='contained' style={{
+                <Button onClick={() => {
+                    navigate('?register=1', {replace: true})
+                }} variant='contained' style={{
                     fontSize: 16,
                     maxWidth: 256,
                     borderRadius: 60,

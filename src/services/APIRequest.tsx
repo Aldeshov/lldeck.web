@@ -1,5 +1,5 @@
-import ResponseError from "../models/ResponseError";
 import Cookies from 'js-cookie';
+import {APIResponseError} from "../models/ResponseError";
 
 export default async function APIRequest(url: string, method: string, headers: Headers, body: any, auth = true) {
     const csrfToken = Cookies.get('csrftoken');
@@ -14,6 +14,6 @@ export default async function APIRequest(url: string, method: string, headers: H
         {method, headers: h, body: JSON.stringify(body)} as RequestInit;
     const response = await fetch(new Request(url, data));
     const result = await response.json();
-    if (!response.ok) throw {message: response.statusText, data: result || {}} as ResponseError;
+    if (!response.ok) throw new APIResponseError(response.statusText, result);
     return result;
 }

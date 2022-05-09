@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import React, {Dispatch, FunctionComponent, SetStateAction, useEffect, useState} from "react";
+import React, {FunctionComponent, useEffect, useState} from "react";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
@@ -27,12 +27,13 @@ import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/material.css'
 import './styles/SignUp.css'
 
-import {SignInService, SignUpService} from "../../services";
+import {SignInService, SignUpService} from "../../../services";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
-import RequestStatus from "../../models/RequestStatus";
-import {validateEmail, validateName, validatePassword, validatePhoneNumber} from "../../tools/validators";
-import {sleep} from "../../tools/extra";
-import ResponseError from "../../models/ResponseError";
+import RequestStatus from "../../../models/RequestStatus";
+import {validateEmail, validateName, validatePassword, validatePhoneNumber} from "../../../tools/validators";
+import {sleep} from "../../../tools/extra";
+import ResponseError from "../../../models/ResponseError";
+import {useNavigate} from "react-router";
 
 interface InputState {
     name: string;
@@ -50,9 +51,10 @@ interface InputState {
 }
 
 
-const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
+const SignUp: FunctionComponent<{ show: boolean }> = ({show}) => {
+    const navigate = useNavigate();
     const globalDispatch = useDispatch();
-    const matches = useMediaQuery('(max-width:1256px)');
+    const matches = useMediaQuery('(max-width:900px)');
     const [visible, setVisible] = useState<boolean>(false);
     const [signInClicked, setSignInClicked] = useState<boolean>(false);
     const [useStateElement, setUseStateElement] = useState<{ status: RequestStatus, message: string }>({
@@ -75,15 +77,19 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     });
 
     useEffect(() => {
-        if (props.show) setVisible(true);
-    }, [props.show]);
+        if (show) setVisible(true)
+    }, [show]);
 
     useEffect(() => {
         if (!visible && signInClicked) {
             setSignInClicked(false);
-            props.setShow(1);
+            navigate('?login=1', {replace: true})
         }
-    }, [visible]);
+    }, [visible, signInClicked, navigate]);
+
+    const handleClose = () => {
+        navigate('', {replace: true})
+    }
 
     const handleChange =
         (prop: keyof InputState) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,7 +180,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                                     setUseStateElement({status: RequestStatus.LOADING, message: "You are logged in"});
                                     await sleep(1000);
                                     globalDispatch({type: 'PUT', payload: {isPermanent: true, data: data.token}});
-                                    props.setShow(0);
+                                    window.location.href = '/'
                                 },
                                 (error) => {
                                     if (error.data) {
@@ -208,7 +214,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                             })
                             setUseStateElement({
                                 status: RequestStatus.ERROR,
-                                message: error.message == 'Bad Request' ? 'Invalid data, please correct them' : error.message
+                                message: error.message === 'Bad Request' ? 'Invalid data, please correct them' : error.message
                             });
                         } else {
                             setUseStateElement({
@@ -231,7 +237,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                 matches && (
                     <IconButton aria-label="delete" size="small"
                                 style={{position: "absolute", right: 20, top: 20}}
-                                onClick={() => props.setShow(0)}>
+                                onClick={handleClose}>
                         <CloseIcon/>
                     </IconButton>
                 )
@@ -380,7 +386,7 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     </LoadingButton>
                     <Typography variant="body1" onClick={() => {
                         setSignInClicked(true);
-                        props.setShow(0);
+                        handleClose();
                     }}>
                         Already have an account?&nbsp;
                         <span className="link">Sign In</span>
@@ -391,22 +397,22 @@ const SignUp: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     );
 
     return (
-        <Modal className="fullscreen-container" open={visible} onClose={() => props.setShow(0)}
+        <Modal className="fullscreen-container" open={visible} onClose={handleClose}
                style={{display: matches ? 'flex' : ''}}>
             <Box maxWidth={!matches ? 750 : 500} maxHeight={!matches ? 500 : 640}
                  style={{margin: !matches ? '2% auto' : 'auto auto 0 auto', width: matches ? '100%' : ''}}>
                 {
                     !matches
                         ?
-                        <Grow in={props.show} mountOnEnter unmountOnExit
+                        <Grow in={show} mountOnEnter unmountOnExit
                               onExited={() => setVisible(false)}
-                              onExit={() => props.setShow(0)}>
+                              onExit={handleClose}>
                             {form}
                         </Grow>
                         :
-                        <Slide direction="up" in={props.show} mountOnEnter unmountOnExit
+                        <Slide direction="up" in={show} mountOnEnter unmountOnExit
                                onExited={() => setVisible(false)}
-                               onExit={() => props.setShow(0)}>
+                               onExit={handleClose}>
                             {form}
                         </Slide>
                 }

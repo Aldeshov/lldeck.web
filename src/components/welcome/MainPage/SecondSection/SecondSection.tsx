@@ -1,9 +1,11 @@
 import {Box, Button, Typography, useMediaQuery} from '@mui/material';
 import DrawingMini from './vectors/Drawing-2-mini.svg';
 import Drawing from './vectors/Drawing-2.svg';
+import {useNavigate} from "react-router";
 
 
 const SecondSection = () => {
+    const navigate = useNavigate();
     const matches = useMediaQuery('(max-width:1080px)');
 
     return (
@@ -28,7 +30,9 @@ const SecondSection = () => {
                     </Typography>
                 )
             }
-            <Button variant='contained' style={{
+            <Button onClick={() => {
+                navigate('?register=1', {replace: true})
+            }} variant='contained' style={{
                 marginBottom: 20,
                 borderRadius: 60,
                 padding: '16px 64px',

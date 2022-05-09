@@ -1,38 +1,40 @@
 import {useDispatch} from "react-redux";
-import React, {Dispatch, FunctionComponent, SetStateAction, useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {
+    Alert,
     AppBar,
     Avatar,
     Box,
     Button,
     ButtonProps,
+    CircularProgress,
     Container,
     Divider,
     ListItemIcon,
     ListItemText,
     Menu,
     MenuItem,
+    Snackbar,
     styled,
     Toolbar,
     Tooltip,
     Typography
 } from "@mui/material";
 import {
+    AccountBox,
     AccountCircle,
-    BookOutlined,
     Equalizer,
     KeyboardArrowDown,
     KeyboardArrowUp,
     Logout,
     Settings
 } from "@mui/icons-material";
-import UserContext from "../../contexts/UserContext";
+import UserContext from "../../../contexts/UserContext";
 import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
-import {ReactComponent as OpenBook} from './vectors/OpenBook.svg';
 import {blue} from "@mui/material/colors";
 import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
-import {SearchInput} from "../../tools/custom";
+import {SearchInput} from "../../../tools/custom";
 
 
 const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
@@ -49,30 +51,33 @@ const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
 }));
 
 
-const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
+const DefaultNavbar = () => {
     const navigate = useNavigate();
     const globalDispatch = useDispatch();
-    const {user, setUser} = useContext(UserContext);
-    const [signInClicked, setSignInClicked] = useState<boolean>(false);
-    const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
+    const {user} = useContext(UserContext);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
-    useEffect(() => {
-        if (signInClicked) {
-            props.setShow(1);
-            setSignInClicked(false);
-            setSignUpClicked(false);
+    const handleNotFinished = () => {
+        setOpenSnackbar(true);
+        handleCloseUserMenu();
+    };
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
         }
-    }, [signInClicked]);
 
-    useEffect(() => {
-        if (signUpClicked) {
-            props.setShow(2);
-            setSignInClicked(false);
-            setSignUpClicked(false);
-        }
-    }, [signUpClicked]);
+        setOpenSnackbar(false);
+    };
 
+    const handleSignIn = () => {
+        navigate('/?login=1', {replace: true});
+    }
+
+    const handleSignUp = () => {
+        navigate('/?register=1', {replace: true});
+    }
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
@@ -83,9 +88,8 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
     };
 
     const signOut = () => {
-        setUser({name: "", avatar: "", authorized: false});
         globalDispatch({type: 'DELETE'});
-        handleCloseUserMenu();
+        window.location.reload()
     };
 
     return (
@@ -104,81 +108,74 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                     <Typography
                         noWrap
                         component="div"
-                        sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}
-                    >
-                        <img src={LogoIcon} alt="logo" height="20"/>
+                        sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
+                        <Link to="/" replace style={{display: 'flex', justifyContent: 'center'}}>
+                            <img src={LogoIcon} alt="logo" height="20"/>
+                        </Link>
                     </Typography>
 
                     {
-                        user.authorized && (
-                            <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                                <Button
-                                    onClick={() => {
-                                    }}
-                                    startIcon={<BookOutlined color="primary"/>}
-                                    sx={{my: 2, display: 'flex', textTransform: 'none', marginLeft: 2, color: '#323232'}}>
-                                    Library
-                                </Button>
-                            </Box>
-                        )
+                        !user.ready && <CircularProgress/>
                     }
 
                     {
-                        !user.authorized && (
+                        !user.authorized && user.ready && (
                             <Button
                                 sx={{flexGrow: 0, margin: 1}}
                                 aria-controls="fade-menu"
                                 aria-haspopup="true"
                                 aria-expanded="true"
                                 style={{fontSize: 16, textTransform: 'none'}}
-                                onClick={() => setSignInClicked(true)}>
+                                onClick={handleSignIn}>
                                 Sign In
                             </Button>
                         )
                     }
 
                     {
-                        !user.authorized && (
-                            <Divider orientation="vertical" color="secondary" flexItem sx={{margin: '20px 0'}}/>
+                        !user.authorized && user.ready && (
+                            <Divider orientation="vertical" flexItem sx={{margin: '20px 0'}}/>
                         )
                     }
 
                     {
-                        !user.authorized && (
+                        !user.authorized && user.ready && (
                             <Button
                                 sx={{flexGrow: 0, margin: 1}}
                                 aria-controls="fade-menu"
                                 aria-haspopup="true"
                                 aria-expanded="true"
                                 style={{fontSize: 16, textTransform: 'none'}}
-                                onClick={() => setSignUpClicked(true)}>
+                                onClick={handleSignUp}>
                                 Sign Up
                             </Button>
                         )
                     }
 
                     {
-                        user.authorized && (
-                            <SearchInput sx={{display: {xs: 'none', md: 'flex'}, mr: 2}} placeholder="Search"/>
+                        user.authorized && user.ready && (
+                            <Box sx={{flexGrow: 1, ml: 2, display: {xs: 'none', md: 'flex'}}}>
+                                <SearchInput sx={{width: '256px'}} placeholder="Search"/>
+                            </Box>
                         )
                     }
 
                     {
-                        user.authorized && (
+                        user.authorized && user.ready && (
                             <Box sx={{flexGrow: 0, marginRight: 1}}>
                                 <SpecialButton
                                     onClick={() => {
+                                        navigate('/decks', {replace: true});
                                     }}
                                     variant="contained"
-                                    startIcon={<OpenBook/>}
+                                    startIcon={<AccountBox color="primary"/>}
                                     sx={{
                                         my: 2,
                                         display: 'flex',
                                         textTransform: 'none',
                                         color: '#323232',
                                         borderRadius: 25
-                                    }}
-                                >
+                                    }}>
                                     My Decks
                                 </SpecialButton>
                             </Box>
@@ -186,7 +183,7 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                     }
 
                     {
-                        user.authorized && (
+                        user.authorized && user.ready && (
                             <Box sx={{flexGrow: 0}}>
                                 <Tooltip title="Account">
                                     <Button onClick={handleOpenUserMenu}
@@ -196,14 +193,14 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                                                 padding: '10px 12px',
                                                 margin: '5px 0',
                                             }}
-                                            startIcon={<Avatar sx={{width: 32, height: 32}} alt={user.name || "User"}
+                                            startIcon={<Avatar sx={{width: 32, height: 32}} alt={user.name || "Profile"}
                                                                src={user.avatar}/>}
                                             endIcon={!anchorElUser ? <KeyboardArrowDown/> : <KeyboardArrowUp/>}>
-                                        {user.name || "User"}
+                                        Profile
                                     </Button>
                                 </Tooltip>
                                 <Menu
-                                    sx={{mt: '45px'}}
+                                    sx={{mt: '45px', width: 256}}
                                     id="menu-appbar"
                                     anchorEl={anchorElUser}
                                     anchorOrigin={{
@@ -217,46 +214,37 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                                     }}
                                     open={Boolean(anchorElUser)}
                                     onClose={handleCloseUserMenu}>
-                                    <MenuItem onClick={handleCloseUserMenu} sx={{width: 320}}>
+                                    <MenuItem onClick={handleNotFinished}>
                                         <ListItemIcon>
-                                            <AccountCircle sx={{width: 20, height: 20}}/>
+                                            <AccountCircle color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Profile
                                         </ListItemText>
-                                        <Typography variant="body2" color="text.secondary">
-                                            ⌘
-                                        </Typography>
                                     </MenuItem>
                                     <MenuItem onClick={() => {
                                         handleCloseUserMenu();
-                                        navigate('/user/settings', {replace: true});
+                                        navigate('/settings', {replace: true});
                                     }} sx={{width: 320}}>
                                         <ListItemIcon>
-                                            <Settings sx={{width: 20, height: 20}}/>
+                                            <Settings color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Settings
                                         </ListItemText>
-                                        <Typography variant="body2" color="text.secondary">
-                                            ⌘
-                                        </Typography>
                                     </MenuItem>
-                                    <MenuItem onClick={handleCloseUserMenu} sx={{width: 320}}>
+                                    <MenuItem onClick={handleNotFinished}>
                                         <ListItemIcon>
-                                            <Equalizer sx={{width: 20, height: 20}}/>
+                                            <Equalizer color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Statistics
                                         </ListItemText>
-                                        <Typography variant="body2" color="text.secondary">
-                                            ⌘
-                                        </Typography>
                                     </MenuItem>
                                     <Divider/>
-                                    <MenuItem onClick={(() => signOut())} sx={{width: 320}}>
+                                    <MenuItem onClick={(() => signOut())}>
                                         <ListItemIcon>
-                                            <Logout sx={{width: 20, height: 20}}/>
+                                            <Logout color="error" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Log out
@@ -268,7 +256,7 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                     }
 
                     {
-                        user.authorized && (
+                        user.authorized && user.ready && (
                             <Box sx={{
                                 flexGrow: 1,
                                 display: {xs: 'flex', md: 'none'},
@@ -281,6 +269,11 @@ const DefaultNavbar: FunctionComponent<{ setShow: Dispatch<SetStateAction<number
                         )
                     }
                 </Toolbar>
+                <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert onClose={handleClose} severity="warning" sx={{width: '100%'}} elevation={2}>
+                        This option will be available soon!
+                    </Alert>
+                </Snackbar>
             </Container>
         </AppBar>
     )

@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import React, {Dispatch, FunctionComponent, SetStateAction, useEffect, useState} from "react";
+import React, {FunctionComponent, useEffect, useState} from "react";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import {
@@ -23,11 +23,12 @@ import {
     useMediaQuery
 } from "@mui/material";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
-import {SignInService} from "../../services";
-import RequestStatus from "../../models/RequestStatus";
-import {validateEmail, validatePassword} from "../../tools/validators";
-import {sleep} from "../../tools/extra";
-import ResponseError from "../../models/ResponseError";
+import {SignInService} from "../../../services";
+import RequestStatus from "../../../models/RequestStatus";
+import {validateEmail, validatePassword} from "../../../tools/validators";
+import {sleep} from "../../../tools/extra";
+import ResponseError from "../../../models/ResponseError";
+import {useNavigate} from "react-router";
 
 interface InputState {
     email: string;
@@ -38,10 +39,12 @@ interface InputState {
     showPassword: boolean;
 }
 
-const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateAction<number>> }> = (props: any) => {
+const SignIn: FunctionComponent<{ show: boolean }> = ({show}) => {
+    const navigate = useNavigate()
     const globalDispatch = useDispatch();
-    const matches = useMediaQuery('(max-width:1256px)');
+    const matches = useMediaQuery('(max-width:900px)');
     const [visible, setVisible] = useState<boolean>(false);
+
     const [signUpClicked, setSignUpClicked] = useState<boolean>(false);
     const [useStateElement, setUseStateElement] = useState<{ status: RequestStatus, message: string }>({
         status: RequestStatus.IDLE,
@@ -57,15 +60,19 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     });
 
     useEffect(() => {
-        if (props.show) setVisible(true);
-    }, [props.show]);
+        if (show) setVisible(true);
+    }, [show]);
 
     useEffect(() => {
         if (!visible && signUpClicked) {
             setSignUpClicked(false);
-            props.setShow(2);
+            navigate('?register=1', {replace: true})
         }
-    }, [visible]);
+    }, [visible, signUpClicked, navigate]);
+
+    const handleClose = () => {
+        navigate('', {replace: true})
+    }
 
     const handleChange =
         (prop: keyof InputState) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +114,7 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                         setUseStateElement({status: RequestStatus.SUCCESSFUL, message: "You are signed in"});
                         await sleep(1000);
                         globalDispatch({type: 'PUT', payload: {isPermanent: values.rememberMe, data: data.token}});
-                        props.setShow(0);
+                        window.location.href = '/'
                     },
                     (error: ResponseError) => {
                         if (error.data) {
@@ -142,7 +149,7 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                 matches && (
                     <IconButton aria-label="delete" size="small"
                                 style={{position: "absolute", right: 25, top: 25}}
-                                onClick={() => props.setShow(0)}>
+                                onClick={handleClose}>
                         <CloseIcon/>
                     </IconButton>
                 )
@@ -247,7 +254,7 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
                     </LoadingButton>
                     <Typography className="link" variant="body1" onClick={() => {
                         setSignUpClicked(true);
-                        props.setShow(0);
+                        handleClose()
                     }}>
                         Create a new account
                     </Typography>
@@ -257,22 +264,22 @@ const SignIn: FunctionComponent<{ show: boolean, setShow: Dispatch<SetStateActio
     );
 
     return (
-        <Modal className="fullscreen-container" open={visible} onClose={() => props.setShow(0)}
+        <Modal className="fullscreen-container" open={visible} onClose={handleClose}
                style={{display: matches ? 'flex' : ''}}>
             <Box maxWidth={!matches ? 750 : 500} maxHeight={!matches ? 500 : 640}
                  style={{margin: !matches ? '5% auto' : 'auto auto 0 auto', width: matches ? '100%' : ''}}>
                 {
                     !matches
                         ?
-                        <Grow in={props.show} mountOnEnter unmountOnExit
+                        <Grow in={show} mountOnEnter unmountOnExit
                               onExited={() => setVisible(false)}
-                              onExit={() => props.setShow(0)}>
+                              onExit={handleClose}>
                             {form}
                         </Grow>
                         :
-                        <Slide direction="up" in={props.show} mountOnEnter unmountOnExit
+                        <Slide direction="up" in={show} mountOnEnter unmountOnExit
                                onExited={() => setVisible(false)}
-                               onExit={() => props.setShow(0)}>
+                               onExit={handleClose}>
                             {form}
                         </Slide>
                 }

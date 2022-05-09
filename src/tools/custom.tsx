@@ -1,5 +1,6 @@
-import {alpha, InputBase, styled} from "@mui/material";
+import {alpha, Card, CardContent, InputBase, Skeleton, styled} from "@mui/material";
 import SearchIcon from './vectors/SearchIcon.svg'
+import React from "react";
 
 export const BootstrapInput = styled(InputBase)(({theme}) => ({
     'label + &': {
@@ -31,7 +32,7 @@ export const SearchInput = styled(InputBase)(({theme}) => ({
     '& .MuiInputBase-input': {
         borderRadius: 25,
         position: 'relative',
-        backgroundColor: theme.palette.mode === 'light' ? '#fcfcfb' : '#2b2b2b',
+        backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#2b2b2b',
         backgroundImage: `url(${SearchIcon})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: '15px 15px',
@@ -51,3 +52,34 @@ export const SearchInput = styled(InputBase)(({theme}) => ({
         },
     },
 }));
+
+export const DeckItemSkeleton = () => {
+    return (
+        <Card
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                width: {xs: 256, sm: 192},
+                height: {xs: 192, sm: 130},
+                borderRadius: 4,
+                p: '20px 10px',
+                m: 2
+            }}
+            elevation={0}>
+            <CardContent sx={{
+                height: '100%',
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between !important'
+            }}>
+                <Skeleton width={150} height={100} variant="text" animation="wave"/>
+                <Skeleton width={75} height={25} variant="text" animation="wave"/>
+                <Skeleton width={100} height={70} variant="text"/>
+            </CardContent>
+        </Card>
+    )
+}
