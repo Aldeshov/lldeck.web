@@ -1,6 +1,6 @@
-import {alpha, Card, CardContent, InputBase, Skeleton, styled} from "@mui/material";
+import {Alert, alpha, Card, CardContent, InputBase, Skeleton, styled} from "@mui/material";
 import SearchIcon from './vectors/SearchIcon.svg'
-import React from "react";
+import React, {FunctionComponent} from "react";
 
 export const BootstrapInput = styled(InputBase)(({theme}) => ({
     'label + &': {
@@ -84,27 +84,33 @@ export const DeckItemSkeleton = () => {
     )
 }
 
-export const CardLoadingSkeleton = () => {
+export const CardContentLoadingSkeleton = () => {
     return (
-        <Card
-            sx={{
-                m: 2,
-                width: 640,
-                maxWidth: '90%',
-                height: 512,
-                borderRadius: 4,
-                p: {xs: '4% 5px', sm: '2%'},
-                filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
-            }} elevation={0}>
-            <CardContent sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center !important'
-            }}>
+        <CardContent sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center !important'
+        }}>
+            <Skeleton width="50%" height={50} variant="text" animation="wave"/>
+            <Skeleton width="25%" height={25} variant="text" animation="wave"/>
+            <Skeleton width="80%" sx={{height: {xs: 256, sm: '312px', md: '460px'}}} variant="text"
+                      animation="wave"/>
+        </CardContent>
+    )
+}
 
-            </CardContent>
-        </Card>
+export const CardContentError: FunctionComponent<{ error: string }> = (error) => {
+    return (
+        <CardContent sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start !important'
+        }}>
+            <Alert severity="error" sx={{width: 300, maxWidth: '90%'}} elevation={1}>
+                {error}
+            </Alert>
+        </CardContent>
     )
 }

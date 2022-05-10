@@ -1,34 +1,31 @@
-import {Alert, Box, Button, Card, CardContent, Fade, IconButton, Skeleton, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, Fade, IconButton, Typography} from "@mui/material";
 import {Edit, ImageNotSupportedRounded, VolumeUpRounded} from "@mui/icons-material";
 import React, {FunctionComponent, useEffect, useState} from "react";
 import CardFront from "../../../models/api/CardFront";
 import CardContentService from "../../../services/CardContentService";
 import ResponseError from "../../../models/ResponseError";
 import CardItem from "../../../models/api/CardItem";
+import {CardContentError, CardContentLoadingSkeleton} from "../../../tools/custom";
 
 
 const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: string, showBack: any }> =
     ({shown, card, deckID, showBack}) => {
-        const [loading, setLoading] = useState<boolean>(true);
-        const [error, setError] = useState<string>("");
-        const [front, setFront] = useState<CardFront>({} as CardFront)
+        const [front, setFront] = useState<CardFront>()
         const [audio, setAudio] = useState<HTMLAudioElement>()
+        const [error, setError] = useState<string>();
+        const [loading, setLoading] = useState<boolean>(true);
 
         useEffect(() => {
             setLoading(true);
+            setError(undefined)
+            setAudio(undefined);
             CardContentService(deckID, card.id, "front")
                 .then((data: CardFront) => {
-                    setFront(data);
-                    if (data.audio) {
-                        setAudio(new Audio(data.audio));
-                    }
+                    if (data) setFront(data);
+                    if (data.audio) setAudio(new Audio(data.audio));
                 })
-                .catch((error: ResponseError) => {
-                    setError(error.data || error.message)
-                })
-                .finally(() => {
-                    setLoading(false);
-                })
+                .catch((error: ResponseError) => setError(error.detail()))
+                .finally(() => setLoading(false))
         }, [card, deckID]);
 
         useEffect(() => {
@@ -38,41 +35,14 @@ const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID:
             }
             return () => {
                 if (audio) {
-                    audio.pause()
-                    audio.remove()
+                    audio.pause();
+                    audio.remove();
                 }
             }
         }, [audio, shown])
 
-        const loadingSkeleton = (
-            <CardContent sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center !important'
-            }}>
-                <Skeleton width="50%" height={50} variant="text" animation="wave"/>
-                <Skeleton width="25%" height={25} variant="text" animation="wave"/>
-                <Skeleton width="80%" sx={{height: {xs: 256, sm: '312px', md: '460px'}}} variant="text"
-                          animation="wave"/>
-            </CardContent>
-        )
-
-        const errorContent = (
-            <CardContent sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start !important'
-            }}>
-                <Alert severity="error" sx={{width: 300, maxWidth: '90%'}} elevation={1}>
-                    {error}
-                </Alert>
-            </CardContent>
-        )
-
         const content = (
-            <CardContent sx={{
+            front && <CardContent sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -114,7 +84,9 @@ const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID:
                                      m: '20px 0',
                                      borderRadius: 4,
                                      boxShadow: '0px 0px 4px #8B8B8B',
-                                     height: {xs: 200, sm: 256, md: 320}
+                                     height: {xs: 200, sm: 256, md: 320},
+                                     objectFit: 'cover',
+                                     maxWidth: {xs: '90%', md: '80%'},
                                  }}>
                             </Box>
                         ) :
@@ -151,9 +123,13 @@ const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID:
                         minHeight: '100%',
                         borderRadius: 4,
                         position: 'absolute',
+                        textAlign: !content ? 'center' : 'revert',
+                        verticalAlign: !content ? 'middle' : 'revert',
+                        lineHeight: !content ? '480px' : 'revert',
                         filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
                     }} elevation={0}>
-                    {loading ? loadingSkeleton : error ? errorContent : content}
+                    {loading ? <CardContentLoadingSkeleton/> : error ?
+                        <CardContentError error={error || "Something went wrong"}/> : content || "No content"}
                 </Card>
             </Fade>
         )

@@ -1,14 +1,14 @@
-export default interface ResponseError extends Error {
-    data: any;
-}
-
-export class APIResponseError extends Error {
+export default class ResponseError extends Error {
     data: any;
 
     constructor(msg: string, data: any) {
         super(msg);
 
         this.data = data;
-        Object.setPrototypeOf(this, APIResponseError.prototype);
+        Object.setPrototypeOf(this, ResponseError.prototype);
+    }
+
+    detail(): string {
+        return this.data && this.data.detail ? this.data.detail : this.message;
     }
 }

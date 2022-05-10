@@ -1,20 +1,41 @@
-import {Alert, Box, Button, Card, CardContent, Fade, IconButton, Skeleton, Stack, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, Fade, IconButton, Stack, Typography} from "@mui/material";
 import {ArrowBackIosNewRounded, Edit, VolumeUpRounded} from "@mui/icons-material";
 import React, {FunctionComponent, useEffect, useState} from "react";
 import CardContentService from "../../../services/CardContentService";
 import CardBack from "../../../models/api/CardBack";
 import ResponseError from "../../../models/ResponseError";
 import CardItem from "../../../models/api/CardItem";
+import {LoadingButton} from "@mui/lab";
+import {CardContentError, CardContentLoadingSkeleton} from "../../../tools/custom";
 
-const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: string, showFront: any }> =
-    ({shown, card, deckID, showFront}) => {
-        const [loading, setLoading] = useState<boolean>(true);
-        const [error, setError] = useState<string>("");
-        const [back, setBack] = useState<CardBack>({} as CardBack);
+const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: string, showFront: any, onAction: any }> =
+    ({shown, card, deckID, showFront, onAction}) => {
+        const [back, setBack] = useState<CardBack>();
         const [audio, setAudio] = useState<HTMLAudioElement>()
+
+        const [error, setError] = useState<string>();
+        const [action, setAction] = useState<string>();
+        const [loading, setLoading] = useState<boolean>(true);
+        const [actionLoading, setActionLoading] = useState<boolean>(false);
+
+        useEffect(() => {
+            if (action && !actionLoading) {
+                onAction(action);
+                setAction(undefined);
+                setActionLoading(true);
+                let timer = window.setTimeout(() => setActionLoading(false), 3000);
+                return () => {
+                    setActionLoading(false);
+                    window.clearTimeout(timer)
+                }
+            }
+        }, [action])
 
         useEffect(() => {
             setLoading(true);
+            setError(undefined);
+            setAudio(undefined);
+            setActionLoading(false);
             CardContentService(deckID, card.id, "back")
                 .then((data: CardBack) => {
                     setBack(data);
@@ -23,7 +44,7 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
                     }
                 })
                 .catch((error: ResponseError) => {
-                    setError(error.data || error.message)
+                    setError(error.detail())
                 })
                 .finally(() => {
                     setLoading(false);
@@ -43,36 +64,8 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
             }
         }, [audio, shown])
 
-        const loadingSkeleton = (
-            <CardContent sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center !important'
-            }}>
-                <Skeleton width="50%" height={50} variant="text" animation="wave"/>
-                <Skeleton width="80%" sx={{height: {xs: 128, sm: '200px', md: '256px'}}} variant="text"
-                          animation="wave"/>
-                <Skeleton width="75%" height={50} variant="text" animation="wave"/>
-                <Skeleton width="75%" height={50} variant="text" animation="wave"/>
-            </CardContent>
-        )
-
-        const errorContent = (
-            <CardContent sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start !important'
-            }}>
-                <Alert severity="error" sx={{width: 300, maxWidth: '90%'}} elevation={1}>
-                    {error}
-                </Alert>
-            </CardContent>
-        )
-
         const content = (
-            <CardContent sx={{
+            back && <CardContent sx={{
                 minHeight: '100%',
                 display: 'flex',
                 flexDirection: 'column',
@@ -132,23 +125,23 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
                 </Typography>
                 <Box width="100%" height={64}></Box>
                 <Stack direction="row" spacing={2}>
-                    <Button variant='contained' sx={{
+                    <LoadingButton onClick={() => setAction('fail')} variant='contained' sx={{
                         backgroundColor: "#5E6CFF",
                         fontSize: 14,
                         borderRadius: 60,
                         padding: {xs: '6px 48px', md: '10px 64px'},
                         textTransform: 'none',
-                    }}>
+                    }} loading={actionLoading}>
                         Again
-                    </Button>
-                    <Button variant='outlined' sx={{
+                    </LoadingButton>
+                    <LoadingButton onClick={() => setAction('success')} variant='outlined' sx={{
                         fontSize: 14,
                         borderRadius: 60,
                         padding: {xs: '6px 48px', md: '10px 64px'},
                         textTransform: 'none',
-                    }}>
+                    }} loading={actionLoading}>
                         Good
-                    </Button>
+                    </LoadingButton>
                 </Stack>
             </CardContent>
         )
@@ -161,9 +154,13 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
                         minHeight: '100%',
                         borderRadius: 4,
                         position: 'absolute',
+                        textAlign: !content ? 'center' : 'revert',
+                        verticalAlign: !content ? 'middle' : 'revert',
+                        lineHeight: !content ? '480px' : 'revert',
                         filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
                     }} elevation={0}>
-                    {loading ? loadingSkeleton : error ? errorContent : content}
+                    {loading ? <CardContentLoadingSkeleton/> : error ?
+                        <CardContentError error={error || "Something went wrong"}/> : content || "No content"}
                 </Card>
             </Fade>
         )
