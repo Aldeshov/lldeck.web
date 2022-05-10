@@ -61,7 +61,7 @@ const Settings = () => {
             setProfileStatusError(undefined)
             ProfileStatusService()
                 .then((data: ProfileStatus) => setProfileStatus(data))
-                .catch((error: ResponseError) => setProfileStatusError(error.detail()))
+                .catch((error: ResponseError) => setProfileStatusError(error.check ? error.detail() : error.message))
                 .finally(() => setProfileStatusLoading(false))
         }
     }, [profileStatus]);
@@ -123,7 +123,7 @@ const Settings = () => {
         ).then(() => {
             ProfileUpdateService(profileFormValues.about, profileFormValues.mode, profileFormValues.language)
                 .then(() => window.location.reload())
-                .catch((error: ResponseError) => setSubmitError(error.detail()))
+                .catch((error: ResponseError) => setSubmitError(error.check ? error.detail() : error.message))
                 .finally(() => setSubmitLoading(false))
         }).catch((error: ResponseError) => {
             if (error.data) {
@@ -136,7 +136,7 @@ const Settings = () => {
                     newPasswordError: error.data.new_password1,
                     confirmPasswordError: error.data.new_password2,
                 });
-            } else setSubmitError(error.detail());
+            } else setSubmitError(error.check ? error.detail() : error.message);
             setSubmitLoading(false);
         })
     };
@@ -193,7 +193,11 @@ const Settings = () => {
                         {
                             profileStatusLoading ? <CircularProgress/> :
                                 profileStatusError ?
-                                    <span style={{color: 'red', fontWeight: 600}}>{profileStatusError}</span> :
+                                    <span style={{
+                                        color: 'red',
+                                        fontWeight: 600,
+                                        fontSize: 16
+                                    }}>{profileStatusError}</span> :
                                     profileStatus && (
                                         <Typography variant="body2" component="div"
                                                     sx={{color: '#5E6CFF', textAlign: 'center', fontWeight: 500}}>
@@ -216,7 +220,7 @@ const Settings = () => {
                         {
                             profileStatusLoading ? <CircularProgress/> :
                                 profileStatusError ?
-                                    <span style={{color: 'red', fontWeight: 600}}>{profileStatusError}</span> :
+                                    <div style={{color: 'red', fontWeight: 600}}>{profileStatusError}</div> :
                                     profileStatus && (
                                         <Typography variant="body2" component="div"
                                                     sx={{color: '#5E6CFF', textAlign: 'center', fontWeight: 500}}>
@@ -281,7 +285,11 @@ const Settings = () => {
                         {
                             profileStatusLoading ? <CircularProgress/> :
                                 profileStatusError ?
-                                    <span style={{color: 'red', fontWeight: 600}}>{profileStatusError}</span> :
+                                    <div style={{
+                                        color: 'red',
+                                        fontWeight: 600,
+                                        fontSize: 14
+                                    }}>{profileStatusError}</div> :
                                     profileStatus && (
                                         <Typography variant="body2" component="div"
                                                     sx={{color: '#5E6CFF', textAlign: 'center', fontWeight: 500}}>

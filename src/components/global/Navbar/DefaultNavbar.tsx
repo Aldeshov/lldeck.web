@@ -6,7 +6,6 @@ import {
     Avatar,
     Box,
     Button,
-    ButtonProps,
     CircularProgress,
     Container,
     Divider,
@@ -15,7 +14,6 @@ import {
     Menu,
     MenuItem,
     Snackbar,
-    styled,
     Toolbar,
     Tooltip,
     Typography
@@ -31,24 +29,9 @@ import {
 } from "@mui/icons-material";
 import UserContext from "../../../contexts/UserContext";
 import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
-import {blue} from "@mui/material/colors";
 import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
 import {SearchInput} from "../../../tools/custom";
-
-
-const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
-    color: theme.palette.getContrastText(blue[200]),
-    backgroundColor: '#EAECFF',
-    boxShadow: 'none',
-    '&:hover': {
-        backgroundColor: '#d3d6ee',
-        boxShadow: 'none',
-    },
-    '&:active': {
-        boxShadow: 'none'
-    }
-}));
 
 
 const DefaultNavbar = () => {
@@ -163,21 +146,23 @@ const DefaultNavbar = () => {
                     {
                         localUser.authorized && localUser.ready && (
                             <Box sx={{flexGrow: 0, marginRight: 1}}>
-                                <SpecialButton
-                                    onClick={() => {
-                                        navigate('/decks', {replace: true});
-                                    }}
-                                    variant="contained"
-                                    startIcon={<AccountBox color="primary"/>}
-                                    sx={{
-                                        my: 2,
-                                        display: 'flex',
-                                        textTransform: 'none',
-                                        color: '#323232',
-                                        borderRadius: 25
-                                    }}>
+                                <Button disableElevation
+                                        onClick={() => navigate('/decks', {replace: true})}
+                                        variant="contained"
+                                        startIcon={<AccountBox color="primary"/>}
+                                        sx={{
+                                            my: 2,
+                                            display: 'flex',
+                                            textTransform: 'none',
+                                            color: '#323232',
+                                            borderRadius: 25,
+                                            backgroundColor: '#EAECFF',
+                                            '&:hover': {
+                                                backgroundColor: '#d3d6ee',
+                                            },
+                                        }}>
                                     My Decks
-                                </SpecialButton>
+                                </Button>
                             </Box>
                         )
                     }
