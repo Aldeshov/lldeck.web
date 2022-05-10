@@ -83,3 +83,28 @@ export const DeckItemSkeleton = () => {
         </Card>
     )
 }
+
+export const CardLoadingSkeleton = () => {
+    return (
+        <Card
+            sx={{
+                m: 2,
+                width: 640,
+                maxWidth: '90%',
+                height: 512,
+                borderRadius: 4,
+                p: {xs: '4% 5px', sm: '2%'},
+                filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+            }} elevation={0}>
+            <CardContent sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center !important'
+            }}>
+
+            </CardContent>
+        </Card>
+    )
+}

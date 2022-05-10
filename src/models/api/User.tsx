@@ -1,8 +1,8 @@
 export default interface User {
-    firstName: string;
-    lastName: string;
-    phoneNumber: number;
+    name: string;
+    email: string;
     avatar: string;
-    email: number;
-    aim: string;
+    phoneNumber: number;
+    date_joined: Date;
+    is_active: boolean;
 }

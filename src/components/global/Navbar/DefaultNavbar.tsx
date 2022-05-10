@@ -54,7 +54,7 @@ const SpecialButton = styled(Button)<ButtonProps>(({theme}) => ({
 const DefaultNavbar = () => {
     const navigate = useNavigate();
     const globalDispatch = useDispatch();
-    const {user} = useContext(UserContext);
+    const {localUser} = useContext(UserContext);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
@@ -99,7 +99,7 @@ const DefaultNavbar = () => {
                     <Typography
                         noWrap
                         component="div"
-                        sx={{flexGrow: !user.authorized ? 1 : 0, display: {xs: 'none', md: 'flex'}}}>
+                        sx={{flexGrow: !localUser.authorized ? 1 : 0, display: {xs: 'none', md: 'flex'}}}>
                         <Link to="/" replace style={{display: 'flex', justifyContent: 'center'}}>
                             <Logo/>
                         </Link>
@@ -115,11 +115,11 @@ const DefaultNavbar = () => {
                     </Typography>
 
                     {
-                        !user.ready && <CircularProgress/>
+                        !localUser.ready && <CircularProgress/>
                     }
 
                     {
-                        !user.authorized && user.ready && (
+                        !localUser.authorized && localUser.ready && (
                             <Button
                                 sx={{flexGrow: 0, margin: 1}}
                                 aria-controls="fade-menu"
@@ -133,13 +133,13 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        !user.authorized && user.ready && (
+                        !localUser.authorized && localUser.ready && (
                             <Divider orientation="vertical" flexItem sx={{margin: '20px 0'}}/>
                         )
                     }
 
                     {
-                        !user.authorized && user.ready && (
+                        !localUser.authorized && localUser.ready && (
                             <Button
                                 sx={{flexGrow: 0, margin: 1}}
                                 aria-controls="fade-menu"
@@ -153,7 +153,7 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        user.authorized && user.ready && (
+                        localUser.authorized && localUser.ready && (
                             <Box sx={{flexGrow: 1, ml: 2, display: {xs: 'none', md: 'flex'}}}>
                                 <SearchInput sx={{width: '256px'}} placeholder="Search"/>
                             </Box>
@@ -161,7 +161,7 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        user.authorized && user.ready && (
+                        localUser.authorized && localUser.ready && (
                             <Box sx={{flexGrow: 0, marginRight: 1}}>
                                 <SpecialButton
                                     onClick={() => {
@@ -183,7 +183,7 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        user.authorized && user.ready && (
+                        localUser.authorized && localUser.ready && (
                             <Box sx={{flexGrow: 0}}>
                                 <Tooltip title="Account">
                                     <Button onClick={handleOpenUserMenu}
@@ -193,8 +193,9 @@ const DefaultNavbar = () => {
                                                 padding: '10px 12px',
                                                 margin: '5px 0',
                                             }}
-                                            startIcon={<Avatar sx={{width: 32, height: 32}} alt={user.name || "Profile"}
-                                                               src={user.avatar}/>}
+                                            startIcon={<Avatar sx={{width: 32, height: 32}}
+                                                               alt={localUser.user ? localUser.user.name : "Profile"}
+                                                               src={`${process.env.REACT_APP_API_URL}${localUser.user?.avatar}`}/>}
                                             endIcon={!anchorElUser ? <KeyboardArrowDown/> : <KeyboardArrowUp/>}>
                                         Profile
                                     </Button>
@@ -256,7 +257,7 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        user.authorized && user.ready && (
+                        localUser.authorized && localUser.ready && (
                             <Box sx={{
                                 flexGrow: 1,
                                 display: {xs: 'flex', md: 'none'},

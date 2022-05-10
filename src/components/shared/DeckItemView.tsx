@@ -4,6 +4,7 @@ import DeckItem from "../../models/api/DeckItem";
 import Deck from "../../models/api/Deck";
 import ResponseError from "../../models/ResponseError";
 import DeckService from "../../services/DeckService";
+import {useNavigate} from "react-router";
 
 interface DeckState {
     item: Deck;
@@ -11,7 +12,9 @@ interface DeckState {
     loading: boolean;
 }
 
+
 const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
+    const navigate = useNavigate();
     const [expanded, setExpanded] = useState(false);
     const [deck, setDeck] = useState<DeckState>({
         item: {} as Deck,
@@ -70,7 +73,10 @@ const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
                         <Typography variant="body2" color="text.secondary" sx={{fontFamily: 'Manrope'}}>
                             {item.cards_count} words
                         </Typography>
-                        <Button variant='contained' sx={{
+                        <Button onClick={() => {
+                            handleClick();
+                            navigate(`/learning/${item.id}`);
+                        }} variant='contained' sx={{
                             mt: 2,
                             fontSize: {xs: 16, sm: 14},
                             fontFamily: 'Manrope',

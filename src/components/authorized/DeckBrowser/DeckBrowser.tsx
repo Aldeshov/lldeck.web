@@ -123,7 +123,7 @@ const DeckBrowser = () => {
                 </Typography>
                 {
                     popularDecks.loading ? DeckTemplateListPlaceHolder :
-                        <HorizontalDeckTemplateListView items={popularDecks.list ? popularDecks.list.results : []}/>
+                        <HorizontalDeckTemplateListView list={popularDecks.list} error={popularDecks.error}/>
                 }
             </Container>
             <Container maxWidth="xl" sx={{m: "40px auto 10px"}}>
@@ -133,7 +133,7 @@ const DeckBrowser = () => {
                 </Typography>
                 {
                     englishDecks.loading ? DeckTemplateListPlaceHolder :
-                        <HorizontalDeckTemplateListView items={englishDecks.list ? englishDecks.list.results : []}/>
+                        <HorizontalDeckTemplateListView list={englishDecks.list} error={englishDecks.error}/>
                 }
             </Container>
             <Container maxWidth="xl" sx={{m: "40px auto 10px"}}>
@@ -143,7 +143,7 @@ const DeckBrowser = () => {
                 </Typography>
                 {
                     frenchDecks.loading ? DeckTemplateListPlaceHolder :
-                        <HorizontalDeckTemplateListView items={frenchDecks.list ? frenchDecks.list.results : []}/>
+                        <HorizontalDeckTemplateListView list={frenchDecks.list} error={frenchDecks.error}/>
                 }
             </Container>
             <Container maxWidth="xl" sx={{m: "40px auto 10px"}}>
@@ -153,7 +153,7 @@ const DeckBrowser = () => {
                 </Typography>
                 {
                     koreanDecks.loading ? DeckTemplateListPlaceHolder :
-                        <HorizontalDeckTemplateListView items={koreanDecks.list ? koreanDecks.list.results : []}/>
+                        <HorizontalDeckTemplateListView list={koreanDecks.list} error={koreanDecks.error}/>
                 }
             </Container>
         </Stack>

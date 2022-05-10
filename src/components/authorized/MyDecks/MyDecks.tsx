@@ -121,8 +121,7 @@ const MyDecks = () => {
                 </Typography>
                 {
                     favoriteDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView
-                            items={favoriteDecks.list ? favoriteDecks.list.results : []}/>
+                        <HorizontalDeckListView list={favoriteDecks.list} error={favoriteDecks.error}/>
                 }
             </Container>
             <Container maxWidth={false} sx={{m: "20px 0 10px", backgroundColor: "#F5E9FF"}}>
@@ -132,8 +131,7 @@ const MyDecks = () => {
                 </Typography>
                 {
                     downloadedDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView
-                            items={downloadedDecks.list ? downloadedDecks.list.results : []}/>
+                        <HorizontalDeckListView list={downloadedDecks.list} error={downloadedDecks.error}/>
                 }
             </Container>
             <Container maxWidth={false} sx={{m: "20px 0 10px", backgroundColor: "#FFF0F0"}}>
@@ -143,8 +141,7 @@ const MyDecks = () => {
                 </Typography>
                 {
                     createdDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView
-                            items={createdDecks.list ? createdDecks.list.results : []}/>
+                        <HorizontalDeckListView list={createdDecks.list} error={createdDecks.error}/>
                 }
             </Container>
         </Stack>
