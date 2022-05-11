@@ -23,12 +23,12 @@ import {
     useMediaQuery
 } from "@mui/material";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
-import {SignInService} from "../../../services";
 import RequestStatus from "../../../models/RequestStatus";
 import {validateEmail, validatePassword} from "../../../tools/validators";
 import {sleep} from "../../../tools/extra";
 import ResponseError from "../../../models/ResponseError";
 import {useNavigate} from "react-router";
+import SignInService from "../../../services/SignInService";
 
 interface InputState {
     email: string;

@@ -6,10 +6,12 @@ import CardContentService from "../../../services/CardContentService";
 import ResponseError from "../../../models/ResponseError";
 import CardItem from "../../../models/api/CardItem";
 import {CardContentError, CardContentLoadingSkeleton} from "../../../tools/custom";
+import {useNavigate} from "react-router";
 
 
 const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: string, showBack: any }> =
     ({shown, card, deckID, showBack}) => {
+        const navigate = useNavigate();
         const [front, setFront] = useState<CardFront>()
         const [audio, setAudio] = useState<HTMLAudioElement>()
         const [error, setError] = useState<string>();
@@ -49,7 +51,9 @@ const CardFrontView: FunctionComponent<{ shown: boolean, card: CardItem, deckID:
                 justifyContent: 'space-around !important'
             }}>
                 <Box width="95%" display="flex" justifyContent="flex-end" mt={1}>
-                    <Button size="medium" startIcon={<Edit/>} sx={{textTransform: 'none'}}>
+                    <Button onClick={() => navigate(`/editor?deck=${deckID}&card=${card.id}`)} size="medium"
+                            startIcon={<Edit/>}
+                            sx={{textTransform: 'none'}}>
                         Edit
                     </Button>
                 </Box>

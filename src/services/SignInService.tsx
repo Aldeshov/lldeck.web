@@ -1,11 +1,8 @@
 import APIRequest from "./APIRequest";
 
-const SignInService = (email: string, password: string, rememberMe: boolean) => {
+const SignInService = (username: string, password: string, remember_me: boolean) => {
     return APIRequest(
-        `/auth/users/me`,
-        "POST", new Headers(),
-        {username: email, password, remember_me: rememberMe},
-        false
+        `/auth/users/me`, "POST", {username, password, remember_me}, false
     )
 }
 

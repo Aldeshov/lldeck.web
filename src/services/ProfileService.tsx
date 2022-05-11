@@ -1,8 +1,7 @@
 import APIRequest from "./APIRequest";
 
 const ProfileService = () => {
-    return APIRequest(`/auth/users/me/profile`,
-        "GET", new Headers(), {})
+    return APIRequest(`/auth/users/me/profile`, "GET")
 }
 
 export default ProfileService

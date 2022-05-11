@@ -27,13 +27,14 @@ import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/material.css'
 import './styles/SignUp.css'
 
-import {SignInService, SignUpService} from "../../../services";
 import {ReactComponent as CloseIcon} from "./vectors/CloseIcon.svg";
 import RequestStatus from "../../../models/RequestStatus";
 import {validateEmail, validateName, validatePassword, validatePhoneNumber} from "../../../tools/validators";
 import {sleep} from "../../../tools/extra";
 import ResponseError from "../../../models/ResponseError";
 import {useNavigate} from "react-router";
+import SignUpService from "../../../services/SignUpService";
+import SignInService from "../../../services/SignInService";
 
 interface InputState {
     name: string;

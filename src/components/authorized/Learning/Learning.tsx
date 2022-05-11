@@ -5,7 +5,7 @@ import ResponseError from "../../../models/ResponseError";
 import CardLearnService from "../../../services/CardLearnService";
 import CardItem from "../../../models/api/CardItem";
 import {Alert, Box, Button, CircularProgress, IconButton, Stack, Typography} from "@mui/material";
-import {ArrowDropDownRounded, PendingRounded} from "@mui/icons-material";
+import {ArrowDropDownRounded, MoreHorizRounded} from "@mui/icons-material";
 import {shuffle} from "../../../tools/extra";
 import UserContext from "../../../contexts/UserContext";
 
@@ -131,7 +131,7 @@ const Learning = () => {
                     New cards/day
                 </Typography>
                 <IconButton size="large" sx={{borderRadius: 16}}>
-                    <PendingRounded color="primary"/>
+                    <MoreHorizRounded color="primary"/>
                 </IconButton>
             </Box>
             <Box sx={{mt: 5, display: 'flex', alignItems: 'center'}}>

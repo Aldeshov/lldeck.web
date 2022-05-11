@@ -20,12 +20,12 @@ import {
 } from "@mui/material";
 import {
     AccountBox,
-    AccountCircle,
-    Equalizer,
+    AssignmentIndRounded,
+    InsertChartRounded,
     KeyboardArrowDown,
     KeyboardArrowUp,
-    Logout,
-    Settings
+    MeetingRoomRounded,
+    SettingsApplicationsRounded
 } from "@mui/icons-material";
 import UserContext from "../../../contexts/UserContext";
 import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
@@ -202,7 +202,7 @@ const DefaultNavbar = () => {
                                     onClose={handleCloseUserMenu}>
                                     <MenuItem onClick={handleNotFinished}>
                                         <ListItemIcon>
-                                            <AccountCircle color="secondary" sx={{width: 20, height: 20}}/>
+                                            <AssignmentIndRounded color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Profile
@@ -213,7 +213,7 @@ const DefaultNavbar = () => {
                                         navigate('/settings', {replace: true});
                                     }} sx={{width: 320}}>
                                         <ListItemIcon>
-                                            <Settings color="secondary" sx={{width: 20, height: 20}}/>
+                                            <SettingsApplicationsRounded color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Settings
@@ -221,7 +221,7 @@ const DefaultNavbar = () => {
                                     </MenuItem>
                                     <MenuItem onClick={handleNotFinished}>
                                         <ListItemIcon>
-                                            <Equalizer color="secondary" sx={{width: 20, height: 20}}/>
+                                            <InsertChartRounded color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Statistics
@@ -230,7 +230,7 @@ const DefaultNavbar = () => {
                                     <Divider/>
                                     <MenuItem onClick={(() => signOut())}>
                                         <ListItemIcon>
-                                            <Logout color="error" sx={{width: 20, height: 20}}/>
+                                            <MeetingRoomRounded color="error" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
                                         <ListItemText>
                                             Log out

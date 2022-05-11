@@ -5,6 +5,7 @@ import {DeckItemSkeleton} from "../../../tools/custom";
 import ResponseError from "../../../models/ResponseError";
 import DeckListService from "../../../services/DeckListService";
 import HorizontalDeckListView from "../../shared/HorizontalDeckListView";
+import {useNavigate} from "react-router";
 
 interface DeckListState {
     list: DeckList;
@@ -13,6 +14,7 @@ interface DeckListState {
 }
 
 const MyDecks = () => {
+    const navigate = useNavigate();
     const DeckListPlaceHolder = (
         <Stack direction="row" flexWrap="wrap" spacing={0}
                sx={{m: 3, justifyContent: {xs: 'center', md: 'flex-start'}}}>
@@ -109,8 +111,8 @@ const MyDecks = () => {
                         borderRadius: 60,
                         padding: {xs: '8px 64px', sm: '0 40px'},
                         textTransform: 'none',
-                    }}>
-                        Create own deck
+                    }} onClick={() => navigate('/editor?', {replace: true})}>
+                        Create own card
                     </Button>
                 </Box>
             </Container>

@@ -7,7 +7,6 @@ import {DefaultNavbar} from './components/global/Navbar';
 import {NotFound} from './components/global/NotFoundPage';
 
 import UserContext from './contexts/UserContext';
-import {UserService} from './services';
 import LocalUser from './models/LocalUser';
 
 import './App.css';
@@ -20,6 +19,8 @@ import User from "./models/api/User";
 import ProfileService from "./services/ProfileService";
 import Profile from "./models/api/Profile";
 import ResponseError from "./models/ResponseError";
+import {Editor} from "./components/authorized/Editor";
+import UserService from "./services/UserService";
 
 const App = () => {
     const globalDispatch = useDispatch();
@@ -64,6 +65,7 @@ const App = () => {
                     {localUser.ready && localUser.authorized && <Route path="/decks" element={<MyDecks/>}/>}
                     {localUser.ready && localUser.authorized && <Route path="/settings" element={<Settings/>}/>}
                     {localUser.ready && localUser.authorized && <Route path="/learning/:deckID" element={<Learning/>}/>}
+                    {localUser.ready && localUser.authorized && <Route path="/editor" element={<Editor/>}/>}
 
                     {
                         localUser.ready ? <Route path="/*" element={<NotFound/>}/> :

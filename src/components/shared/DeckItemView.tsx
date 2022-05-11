@@ -73,7 +73,7 @@ const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
                         <Typography variant="body2" color="text.secondary" sx={{fontFamily: 'Manrope'}}>
                             {item.cards_count} words
                         </Typography>
-                        <Button onClick={() => {
+                        <Button component="span" onClick={() => {
                             handleClick();
                             navigate(`/learning/${item.id}`);
                         }} variant='contained' sx={{

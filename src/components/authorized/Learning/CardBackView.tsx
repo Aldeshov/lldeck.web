@@ -7,9 +7,11 @@ import ResponseError from "../../../models/ResponseError";
 import CardItem from "../../../models/api/CardItem";
 import {LoadingButton} from "@mui/lab";
 import {CardContentError, CardContentLoadingSkeleton} from "../../../tools/custom";
+import {useNavigate} from "react-router";
 
 const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: string, showFront: any, onAction: any }> =
     ({shown, card, deckID, showFront, onAction}) => {
+        const navigate = useNavigate();
         const [back, setBack] = useState<CardBack>();
         const [audio, setAudio] = useState<HTMLAudioElement>()
 
@@ -77,7 +79,8 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
                             onClick={showFront}>
                         Back
                     </Button>
-                    <Button size="medium" startIcon={<Edit/>} sx={{textTransform: 'none'}}>
+                    <Button onClick={() => navigate(`/editor?deck=${deckID}&card=${card.id}`)}
+                            size="medium" startIcon={<Edit/>} sx={{textTransform: 'none'}}>
                         Edit
                     </Button>
                 </Box>
