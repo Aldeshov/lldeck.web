@@ -4,7 +4,22 @@ import CardList from "../../../models/api/CardList";
 import ResponseError from "../../../models/ResponseError";
 import CardLearnService from "../../../services/CardLearnService";
 import CardItem from "../../../models/api/CardItem";
-import {Alert, Box, Button, CircularProgress, IconButton, Stack, Typography} from "@mui/material";
+import {
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CircularProgress,
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputLabel,
+    Modal,
+    OutlinedInput,
+    Stack,
+    Typography
+} from "@mui/material";
 import {ArrowDropDownRounded, MoreHorizRounded} from "@mui/icons-material";
 import {shuffle} from "../../../tools/extra";
 import UserContext from "../../../contexts/UserContext";
@@ -12,6 +27,8 @@ import UserContext from "../../../contexts/UserContext";
 import Congratulations from "./vectors/Congratulations.svg";
 import CardActionService from "../../../services/CardActionService";
 import CardView from "./CardView";
+import {LoadingButton} from "@mui/lab";
+import ProfileUpdateService from "../../../services/ProfileUpdateService";
 
 
 const Learning = () => {
@@ -29,6 +46,13 @@ const Learning = () => {
     const [newCards, setNewCards] = useState<CardList>();
     const [learningCards, setLearningCards] = useState<CardList>();
     const [toReviewCards, setToReviewCards] = useState<CardList>();
+
+    const [submitted, setSubmitted] = React.useState(false);
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [newAim, setNewAim] = React.useState<string>(`${localUser.profile?.aim || ''}`);
+    const [newAimError, setNewAimError] = React.useState<string>('');
+    const handleOpen = () => setModalOpen(true);
+    const handleClose = () => setModalOpen(false);
 
     const loadData = () => {
         if (deckID) {
@@ -56,6 +80,18 @@ const Learning = () => {
         } else {
             setError("Undefined deck-ID");
             setLoading(false);
+        }
+    }
+
+    const handleAimSubmit = () => {
+        if (!submitted) {
+            setSubmitted(true);
+            ProfileUpdateService({aim: newAim})
+                .then(() => window.location.reload())
+                .catch((error: ResponseError) => setNewAimError(
+                    error.check ? (error.data && error.data.aim) : error.message
+                ))
+                .finally(() => setSubmitted(false))
         }
     }
 
@@ -192,7 +228,7 @@ const Learning = () => {
                                     <Typography textAlign="center" color="primary" variant="h6" fontWeight="500">
                                         New cards/day
                                     </Typography>
-                                    <Button size="large" endIcon={<ArrowDropDownRounded/>}
+                                    <Button size="large" endIcon={<ArrowDropDownRounded/>} onClick={handleOpen}
                                             sx={{fontSize: 18, ml: 1, textTransform: 'none', borderRadius: 16}}>
                                         {localUser.profile?.aim}
                                     </Button>
@@ -200,6 +236,63 @@ const Learning = () => {
                                 <CardView action={handleAction} queue={queue} card={card} deckID={deckID || ''}/>
                             </Box> : (!loading && !queue && noCard)
             }
+            <Modal
+                open={modalOpen}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description">
+                <Card sx={{
+                    top: '50%',
+                    left: '50%',
+                    position: 'absolute',
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 512,
+                    maxWidth: '90%',
+                    p: 4,
+                }} elevation={0}>
+                    <CardContent sx={{
+                        width: '100%',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'space-around !important',
+                        gap: 2
+                    }}>
+                        <Typography variant="h5" fontWeight={500} gutterBottom component="div">
+                            Write a number of words you want to study per day
+                        </Typography>
+                        <FormControl fullWidth error={!!newAimError} variant="outlined" margin="dense">
+                            <InputLabel sx={{fontSize: 14}} htmlFor="aimInput">Aim</InputLabel>
+                            <OutlinedInput
+                                type='number'
+                                label="Aim"
+                                id="aimInput"
+                                value={newAim}
+                                sx={{backgroundColor: '#F5F4F8'}}
+                                inputProps={{'aria-label': 'weight'}}
+                                aria-describedby="newAimError"
+                                onChange={(event) => setNewAim(event.target.value)}
+                            />
+                            <FormHelperText id="newAimError">{newAimError}</FormHelperText>
+                        </FormControl>
+                        <LoadingButton onClick={handleAimSubmit} loading={submitted} disabled={!newAim}
+                                       variant='contained' sx={{
+                            borderRadius: 60,
+                            fontFamily: 'Manrope',
+                            padding: {xs: '4px 32px', md: '8px 64px'},
+                            textTransform: 'none',
+                        }}>
+                            Save
+                        </LoadingButton>
+                    </CardContent>
+                </Card>
+            </Modal>
         </React.Fragment>
     )
 }

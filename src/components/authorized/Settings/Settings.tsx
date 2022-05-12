@@ -2,6 +2,9 @@ import {
     Alert,
     Avatar,
     Box,
+    Button,
+    Card,
+    CardContent,
     CircularProgress,
     Container,
     FormControl,
@@ -9,6 +12,7 @@ import {
     Grow,
     InputLabel,
     MenuItem,
+    Modal,
     OutlinedInput,
     Paper,
     Select,
@@ -23,6 +27,7 @@ import ResponseError from "../../../models/ResponseError";
 import ProfileStatusService from "../../../services/ProfileStatusService";
 import UserUpdateService from "../../../services/UserUpdateService";
 import ProfileUpdateService from "../../../services/ProfileUpdateService";
+import UserDeleteService from "../../../services/UserDeleteService";
 
 interface ProfileState {
     about: string;
@@ -55,6 +60,11 @@ const Settings = () => {
     const [submitLoading, setSubmitLoading] = useState<boolean>(false);
     const [submitError, setSubmitError] = useState<string>();
 
+    const [submitted, setSubmitted] = React.useState(false);
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const handleOpen = () => setModalOpen(true);
+    const handleClose = () => setModalOpen(false);
+
     useEffect(() => {
         if (!profileStatus) {
             setProfileStatusLoading(true);
@@ -77,7 +87,7 @@ const Settings = () => {
         emailError: "",
         name: localUser.user?.name || "",
         nameError: "",
-        phoneNumber: localUser.user?.phoneNumber || "",
+        phoneNumber: localUser.user?.phone_number || "",
         phoneNumberError: "",
         oldPassword: "",
         oldPasswordError: "",
@@ -86,6 +96,16 @@ const Settings = () => {
         confirmPassword: "",
         confirmPasswordError: ""
     });
+
+    const handleDeleteSubmit = () => {
+        if (!submitted) {
+            setSubmitted(true);
+            UserDeleteService()
+                .then(() => window.location.reload())
+                .catch((error: ResponseError) => console.log(error))
+                .finally(() => setSubmitted(false))
+        }
+    }
 
     const handlePhoneNumber = (value: string) => {
         setUserFormValues({
@@ -121,7 +141,11 @@ const Settings = () => {
             userFormValues.newPassword,
             userFormValues.confirmPassword
         ).then(() => {
-            ProfileUpdateService(profileFormValues.about, profileFormValues.mode, profileFormValues.language)
+            ProfileUpdateService({
+                about: profileFormValues.about,
+                selected_theme_mode: profileFormValues.mode,
+                selected_language: profileFormValues.language
+            })
                 .then(() => window.location.reload())
                 .catch((error: ResponseError) => setSubmitError(error.check ? error.detail() : error.message))
                 .finally(() => setSubmitLoading(false))
@@ -167,7 +191,7 @@ const Settings = () => {
                             {localUser.user?.name}
                         </Typography>
                         <span style={{color: '#585656', margin: '2px 0'}}>
-                            {localUser.user?.phoneNumber}
+                            {localUser.user?.phone_number}
                         </span>
                         <span style={{color: '#585656', margin: '2px 0'}}>
                             {localUser.user?.email}
@@ -260,7 +284,7 @@ const Settings = () => {
                             {localUser.user?.name}
                         </Typography>
                         <span style={{color: '#585656', margin: '2px 0'}}>
-                            {localUser.user?.phoneNumber}
+                            {localUser.user?.phone_number}
                         </span>
                         <span style={{color: '#585656', margin: '2px 0'}}>
                             {localUser.user?.email}
@@ -505,7 +529,7 @@ const Settings = () => {
                 </Box>
 
                 <Box display="flex" alignItems="center" m={1}>
-                    <Typography className="link" variant="body1">
+                    <Typography className="link" variant="body1" onClick={handleOpen}>
                         Delete account
                     </Typography>
                 </Box>
@@ -526,6 +550,59 @@ const Settings = () => {
                     </LoadingButton>
                 </Box>
             </Container>
+            <Modal
+                open={modalOpen}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description">
+                <Card sx={{
+                    top: '50%',
+                    left: '50%',
+                    position: 'absolute',
+                    transform: 'translate(-50%, -50%)',
+                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    borderRadius: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 512,
+                    maxWidth: '90%',
+                    p: 4,
+                }} elevation={0}>
+                    <CardContent sx={{
+                        width: '100%',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'space-around !important',
+                        gap: 2
+                    }}>
+                        <Typography variant="h5" fontWeight={500} gutterBottom component="div">
+                            Are you sure you want to delete your account?
+                        </Typography>
+                        <Box width="100%" display="flex" flexDirection="row" alignItems="center"
+                             justifyContent="space-around">
+                            <Button onClick={handleClose} variant='contained' sx={{
+                                borderRadius: 60,
+                                fontFamily: 'Manrope',
+                                padding: {xs: '4px 32px', md: '8px 64px'},
+                                textTransform: 'none',
+                            }}>
+                                No
+                            </Button>
+                            <LoadingButton loading={submitted} variant='outlined' color="error" sx={{
+                                borderRadius: 60,
+                                fontFamily: 'Manrope',
+                                padding: {xs: '4px 28px', md: '8px 60px'},
+                                textTransform: 'none',
+                            }} onClick={handleDeleteSubmit}>
+                                Yes
+                            </LoadingButton>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Modal>
         </Container>
     )
 }
