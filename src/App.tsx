@@ -21,6 +21,7 @@ import Profile from "./models/api/Profile";
 import ResponseError from "./models/ResponseError";
 import {Editor} from "./components/authorized/Editor";
 import UserService from "./services/UserService";
+import {Search} from "./components/authorized/Search";
 
 const App = () => {
     const globalDispatch = useDispatch();
@@ -66,6 +67,7 @@ const App = () => {
                     {localUser.ready && localUser.authorized && <Route path="/settings" element={<Settings/>}/>}
                     {localUser.ready && localUser.authorized && <Route path="/learning/:deckID" element={<Learning/>}/>}
                     {localUser.ready && localUser.authorized && <Route path="/editor" element={<Editor/>}/>}
+                    {localUser.ready && localUser.authorized && <Route path="/search" element={<Search/>}/>}
 
                     {
                         localUser.ready ? <Route path="/*" element={<NotFound/>}/> :

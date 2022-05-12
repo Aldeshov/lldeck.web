@@ -1,8 +1,24 @@
-import {FunctionComponent} from "react";
-import {Button, Card, CardContent, Typography} from "@mui/material";
+import {FunctionComponent, useState} from "react";
+import {Card, CardContent, Typography} from "@mui/material";
 import DeckTemplateItem from "../../models/api/DeckTemplateItem";
+import {LoadingButton} from "@mui/lab";
+import DeckCreateService from "../../services/DeckCreateService";
+import {useNavigate} from "react-router";
 
 const DeckTemplateItemView: FunctionComponent<{ item: DeckTemplateItem }> = ({item}) => {
+    const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = () => {
+        setLoading(true);
+        let service = DeckCreateService({name: item.name, template: item.id})
+        service.then(() => navigate('/decks'))
+            .catch((error) => {
+                setLoading(false);
+                console.log(error);
+            })
+    }
+
     return (
         <Card sx={{
             display: 'flex',
@@ -32,16 +48,16 @@ const DeckTemplateItemView: FunctionComponent<{ item: DeckTemplateItem }> = ({it
                 <Typography variant="body2" color="text.secondary" sx={{fontFamily: 'Manrope'}}>
                     {item.cards_count} words
                 </Typography>
-                <Button variant='contained' sx={{
+                <LoadingButton loading={loading} variant='contained' sx={{
                     fontSize: {xs: 16, sm: 14},
                     fontFamily: 'Manrope',
                     maxWidth: 128,
                     borderRadius: 60,
                     padding: {xs: '8px 64px', sm: '5px 48px'},
                     textTransform: 'none',
-                }}>
+                }} onClick={handleSubmit}>
                     Add
-                </Button>
+                </LoadingButton>
             </CardContent>
         </Card>
     )

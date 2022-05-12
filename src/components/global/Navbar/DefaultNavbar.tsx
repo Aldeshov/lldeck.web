@@ -40,6 +40,7 @@ const DefaultNavbar = () => {
     const {localUser} = useContext(UserContext);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const [search, setSearch] = React.useState<string>('');
 
     const handleNotFinished = () => {
         setOpenSnackbar(true);
@@ -137,8 +138,15 @@ const DefaultNavbar = () => {
 
                     {
                         localUser.authorized && localUser.ready && (
-                            <Box sx={{flexGrow: 1, ml: 2, display: {xs: 'none', md: 'flex'}}}>
-                                <SearchInput sx={{width: '256px'}} placeholder="Search"/>
+                            <Box component="form" sx={{flexGrow: 1, ml: 2, display: {xs: 'none', md: 'flex'}}}>
+                                <SearchInput sx={{width: '256px'}} value={search}
+                                             onChange={(event) => setSearch(event.target.value)}
+                                             placeholder="Search"/>
+                                <input type="submit" hidden style={{display: 'none'}}
+                                       onClick={(event) => {
+                                           event.preventDefault();
+                                           navigate('/search?q=' + search, {replace: true})
+                                       }}/>
                             </Box>
                         )
                     }
@@ -243,14 +251,20 @@ const DefaultNavbar = () => {
 
                     {
                         localUser.authorized && localUser.ready && (
-                            <Box sx={{
+                            <Box component="form" sx={{
                                 flexGrow: 1,
                                 display: {xs: 'flex', md: 'none'},
                                 marginBottom: 2,
                                 width: '100%',
                                 justifyContent: 'center'
                             }}>
-                                <SearchInput sx={{width: '90%'}} placeholder="Search"/>
+                                <SearchInput sx={{width: '90%'}} placeholder="Search" value={search}
+                                             onChange={(event) => setSearch(event.target.value)}/>
+                                <input type="submit" hidden style={{display: 'none'}}
+                                       onClick={(event) => {
+                                           event.preventDefault();
+                                           navigate('/search?q=' + search, {replace: true})
+                                       }}/>
                             </Box>
                         )
                     }
