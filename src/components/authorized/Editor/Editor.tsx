@@ -237,6 +237,15 @@ const Editor = () => {
                         }
                     }}
                     onClose={() => setDeckListOpen(false)}
+                    renderOption={(props, option) => {
+                        return (
+                            <Box component="li" {...props} key={option.id}>
+                                <Chip label={option.id} size="small" variant="outlined"/>
+                                &nbsp;{option.name}&nbsp;
+                                <Chip label={`${option.cards_count} words`} size="small"/>
+                            </Box>
+                        );
+                    }}
                     isOptionEqualToValue={(option, value) => option.id === value.id}
                     getOptionLabel={(option) => option.name}
                     options={decks?.results || []}
