@@ -1,4 +1,3 @@
-import {useDispatch} from "react-redux";
 import React, {useContext, useState} from "react";
 import {
     Alert,
@@ -32,11 +31,11 @@ import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
 import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
 import {SearchInput} from "../../../tools/custom";
+import TokenStore from "../../../stores/TokenStore";
 
 
 const DefaultNavbar = () => {
     const navigate = useNavigate();
-    const globalDispatch = useDispatch();
     const {localUser} = useContext(UserContext);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
@@ -72,7 +71,7 @@ const DefaultNavbar = () => {
     };
 
     const signOut = () => {
-        globalDispatch({type: 'DELETE'});
+        TokenStore.delete();
         window.location.reload()
     };
 

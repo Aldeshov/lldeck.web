@@ -1,5 +1,4 @@
 import {Link} from "react-router-dom";
-import {useDispatch} from "react-redux";
 import React, {FunctionComponent, useEffect, useState} from "react";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -29,6 +28,7 @@ import {sleep} from "../../../tools/extra";
 import ResponseError from "../../../models/ResponseError";
 import {useNavigate} from "react-router";
 import SignInService from "../../../services/SignInService";
+import TokenStore from "../../../stores/TokenStore";
 
 interface InputState {
     email: string;
@@ -41,7 +41,6 @@ interface InputState {
 
 const SignIn: FunctionComponent<{ show: boolean }> = ({show}) => {
     const navigate = useNavigate()
-    const globalDispatch = useDispatch();
     const matches = useMediaQuery('(max-width:900px)');
     const [visible, setVisible] = useState<boolean>(false);
 
@@ -113,8 +112,9 @@ const SignIn: FunctionComponent<{ show: boolean }> = ({show}) => {
                     async (data: any) => {
                         setUseStateElement({status: RequestStatus.SUCCESSFUL, message: "You are signed in"});
                         await sleep(1000);
-                        globalDispatch({type: 'PUT', payload: {isPermanent: values.rememberMe, data: data.token}});
-                        window.location.href = '/'
+
+                        TokenStore.put({isPermanent: values.rememberMe, data: data.token});
+                        window.location.href = '/';
                     },
                     (error: ResponseError) => {
                         if (error.data) {

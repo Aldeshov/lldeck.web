@@ -1,5 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Route, Routes} from 'react-router';
 
 import {MainPage} from './components/welcome/MainPage';
@@ -22,14 +21,14 @@ import ResponseError from "./models/ResponseError";
 import {Editor} from "./components/authorized/Editor";
 import UserService from "./services/UserService";
 import {Search} from "./components/authorized/Search";
+import TokenStore from "./stores/TokenStore";
 
 const App = () => {
-    const globalDispatch = useDispatch();
-    const defaultStore = (useSelector(store => store) as string);
     const [localUser, setLocalUser] = useState<LocalUser>({ready: false, authorized: false});
     const userState = useMemo(() => ({localUser: localUser, setLocalUser: setLocalUser}), [localUser]);
-    const loadData = useCallback(() => {
-        if (defaultStore) {
+
+    useEffect(() => {
+        if (!localUser.ready) {
             UserService()
                 .then((user: User) => {
                     ProfileService()
@@ -38,24 +37,17 @@ const App = () => {
                         })
                         .catch((error: ResponseError) => {
                             setLocalUser({ready: true, authorized: false});
-                            globalDispatch({type: 'DELETE'});
-                            console.log(error)
+                            TokenStore.delete();
+                            console.error(error)
                         })
                 })
                 .catch((error: ResponseError) => {
                     setLocalUser({ready: true, authorized: false});
-                    globalDispatch({type: 'DELETE'});
-                    console.log(error)
+                    TokenStore.delete();
+                    console.error(error)
                 })
-        } else {
-            setLocalUser({ready: true, authorized: false});
         }
-    }, [])
-
-    globalDispatch({type: 'GET'});
-    useEffect(() => {
-        loadData()
-    }, [loadData]);
+    }, [localUser]);
 
     return (
         <React.Fragment>

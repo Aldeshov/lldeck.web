@@ -1,10 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
 import {BrowserRouter as Router} from 'react-router-dom';
 
 import reportWebVitals from './reportWebVitals';
-import {defaultStore} from './stores';
 import App from './App';
 
 import './index.css';
@@ -14,11 +12,9 @@ import {ThemeProvider} from "@mui/material";
 ReactDOM.render(
     <React.StrictMode>
         <Router>
-            <Provider store={defaultStore}>
-                <ThemeProvider theme={theme}>
-                    <App/>
-                </ThemeProvider>
-            </Provider>
+            <ThemeProvider theme={theme}>
+                <App/>
+            </ThemeProvider>
         </Router>
     </React.StrictMode>,
     document.getElementById('root')
