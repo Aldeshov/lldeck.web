@@ -4,6 +4,6 @@ export default interface ProfileStatus {
     deck_templates_count: string;
     downloaded_deck_templates_count: string;
     cards_learned_today: string;
-    minutes_gone_today: string;
+    minutes_gone_today: number;
     total_reviews: string;
 }

@@ -8,6 +8,7 @@ export default class TokenStore {
     }
 
     static delete() {
+        Cookies.remove('sessionid');
         Cookies.remove('csrftoken');
         localStorage.removeItem('Token');
         sessionStorage.removeItem('Token');

@@ -17,7 +17,6 @@ import {Learning} from "./components/authorized/Learning";
 import User from "./models/api/User";
 import ProfileService from "./services/ProfileService";
 import Profile from "./models/api/Profile";
-import ResponseError from "./models/ResponseError";
 import {Editor} from "./components/authorized/Editor";
 import UserService from "./services/UserService";
 import {Search} from "./components/authorized/Search";
@@ -35,16 +34,14 @@ const App = () => {
                         .then((profile: Profile) => {
                             setLocalUser({ready: true, authorized: true, user: user, profile: profile});
                         })
-                        .catch((error: ResponseError) => {
+                        .catch(() => {
                             setLocalUser({ready: true, authorized: false});
                             TokenStore.delete();
-                            console.error(error)
                         })
                 })
-                .catch((error: ResponseError) => {
+                .catch(() => {
                     setLocalUser({ready: true, authorized: false});
                     TokenStore.delete();
-                    console.error(error)
                 })
         }
     }, [localUser]);

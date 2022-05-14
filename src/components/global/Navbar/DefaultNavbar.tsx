@@ -32,6 +32,7 @@ import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
 import {SearchInput} from "../../../tools/custom";
 import TokenStore from "../../../stores/TokenStore";
+import APIRequest from "../../../services/APIRequest";
 
 
 const DefaultNavbar = () => {
@@ -71,8 +72,10 @@ const DefaultNavbar = () => {
     };
 
     const signOut = () => {
-        TokenStore.delete();
-        window.location.reload()
+        APIRequest(`/auth/users/me`, "POST", {logout: 1}).then(() => {
+            TokenStore.delete();
+            window.location.reload();
+        }).catch((error) => error)
     };
 
     return (
@@ -187,7 +190,7 @@ const DefaultNavbar = () => {
                                             }}
                                             startIcon={<Avatar sx={{width: 32, height: 32}}
                                                                alt={localUser.user ? localUser.user.name : "Profile"}
-                                                               src={`${process.env.REACT_APP_API_URL}${localUser.user?.avatar}`}/>}
+                                                               src={localUser.user?.avatar}/>}
                                             endIcon={!anchorElUser ? <KeyboardArrowDown/> : <KeyboardArrowUp/>}>
                                         Profile
                                     </Button>

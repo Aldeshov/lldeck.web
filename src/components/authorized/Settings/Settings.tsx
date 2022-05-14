@@ -184,7 +184,7 @@ const Settings = () => {
                         margin: 2,
                         boxShadow: '0 0 2px #BBBBBB'
                     }} alt="Avatar"
-                            src={`${process.env.REACT_APP_API_URL}${localUser.user?.avatar}`}/>
+                            src={localUser.user?.avatar}/>
 
                     <Typography component="span" sx={{display: 'flex', flexDirection: 'column'}}>
                         <Typography variant="h5" component="div">
@@ -226,7 +226,7 @@ const Settings = () => {
                                         <Typography variant="body2" component="div"
                                                     sx={{color: '#5E6CFF', textAlign: 'center', fontWeight: 500}}>
                                             Studied <strong>{profileStatus.cards_learned_today}</strong> cards
-                                            in <strong>{profileStatus.minutes_gone_today}</strong> minutes today
+                                            in <strong>{profileStatus.minutes_gone_today.toFixed(2)}</strong> minutes today
                                         </Typography>
                                     )
                         }
@@ -265,7 +265,7 @@ const Settings = () => {
                     position: 'relative',
                     top: 150,
                     boxShadow: '0 0 8px #cccccc'
-                }} alt="Avatar" src={`${process.env.REACT_APP_API_URL}${localUser.user?.avatar}`}/>
+                }} alt="Avatar" src={localUser.user?.avatar}/>
 
                 <Paper elevation={0} sx={{
                     width: '70%',
@@ -318,7 +318,7 @@ const Settings = () => {
                                         <Typography variant="body2" component="div"
                                                     sx={{color: '#5E6CFF', textAlign: 'center', fontWeight: 500}}>
                                             Studied <strong>{profileStatus.cards_learned_today}</strong> cards
-                                            in <strong>{profileStatus.minutes_gone_today}</strong> minutes today.
+                                            in <strong>{profileStatus.minutes_gone_today.toFixed(2)}</strong> minutes today.
                                             <br/>
                                             Total <strong>{profileStatus.total_reviews}</strong> reviews.
                                         </Typography>
