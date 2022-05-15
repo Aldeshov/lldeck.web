@@ -1,7 +1,7 @@
-import APIRequest from "./APIRequest";
+import AxiosRequest from "./AxiosRequest";
 
 const ProfileUpdateService = (body: any) => {
-    return APIRequest(`/auth/users/me/profile`, "PUT", body)
+    return AxiosRequest(`/auth/users/me/profile`, "PUT", body)
 }
 
 export default ProfileUpdateService

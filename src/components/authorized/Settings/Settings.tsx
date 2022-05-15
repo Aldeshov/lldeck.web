@@ -1,6 +1,7 @@
 import {
     Alert,
     Avatar,
+    Badge,
     Box,
     Button,
     Card,
@@ -10,6 +11,7 @@ import {
     FormControl,
     FormHelperText,
     Grow,
+    IconButton,
     InputLabel,
     MenuItem,
     Modal,
@@ -28,6 +30,8 @@ import ProfileStatusService from "../../../services/ProfileStatusService";
 import UserUpdateService from "../../../services/UserUpdateService";
 import ProfileUpdateService from "../../../services/ProfileUpdateService";
 import UserDeleteService from "../../../services/UserDeleteService";
+import {EditRounded} from "@mui/icons-material";
+import {AxiosError} from "axios";
 
 interface ProfileState {
     about: string;
@@ -82,6 +86,7 @@ const Settings = () => {
         language: localUser.profile?.selected_language || 0,
     });
 
+    const [avatar, setAvatar] = useState<File>();
     const [userFormValues, setUserFormValues] = useState<UserState>({
         email: localUser.user?.email || "",
         emailError: "",
@@ -129,6 +134,11 @@ const Settings = () => {
             });
         };
 
+    const handlePhotoFile = (event: any) => {
+        event.preventDefault();
+        setAvatar(event.target.files[0]);
+    }
+
     const handleSubmit = (event: any) => {
         event.preventDefault();
         setSubmitLoading(true);
@@ -141,13 +151,18 @@ const Settings = () => {
             userFormValues.newPassword,
             userFormValues.confirmPassword
         ).then(() => {
-            ProfileUpdateService({
-                about: profileFormValues.about,
-                selected_theme_mode: profileFormValues.mode,
-                selected_language: profileFormValues.language
-            })
+            const formData = new FormData();
+            formData.append("about", profileFormValues.about);
+            formData.append("selected_theme_mode", profileFormValues.mode.toString());
+            formData.append("selected_language", profileFormValues.language.toString());
+            if (avatar) formData.append("avatar", avatar);
+            ProfileUpdateService(formData)
                 .then(() => window.location.reload())
-                .catch((error: ResponseError) => setSubmitError(error.check ? error.detail() : error.message))
+                .catch((error: AxiosError<any>) => {
+                    if (error.response && error.response.data) {
+                        setSubmitError(error.response.data.avatar || error.message)
+                    } else setSubmitError(error.message)
+                })
                 .finally(() => setSubmitLoading(false))
         }).catch((error: ResponseError) => {
             if (error.data) {
@@ -178,13 +193,26 @@ const Settings = () => {
                 filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
             }}>
                 <Box sx={{display: 'flex', alignItems: 'center', margin: 1}}>
-                    <Avatar sx={{
-                        width: 200,
-                        height: 200,
-                        margin: 2,
-                        boxShadow: '0 0 2px #BBBBBB'
-                    }} alt="Avatar"
-                            src={localUser.user?.avatar}/>
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                        badgeContent={
+                            <label htmlFor="avatar">
+                                <input style={{display: 'none'}} onChange={handlePhotoFile}
+                                       accept="image/*" id="avatar" type="file"/>
+                                <IconButton component="span">
+                                    <EditRounded color="primary"/>
+                                </IconButton>
+                            </label>
+                        }
+                    >
+                        <Avatar sx={{
+                            width: 200,
+                            height: 200,
+                            margin: 2,
+                            boxShadow: '0 0 2px #BBBBBB'
+                        }} alt={localUser.user?.name} src={localUser.user?.avatar}/>
+                    </Badge>
 
                     <Typography component="span" sx={{display: 'flex', flexDirection: 'column'}}>
                         <Typography variant="h5" component="div">
@@ -257,15 +285,29 @@ const Settings = () => {
             </Paper>
 
             <Box sx={{mt: -12, display: {md: 'none', xs: ''}}}>
-                <Avatar sx={{
-                    zIndex: 100,
-                    width: 200,
-                    height: 200,
-                    margin: '0 auto',
-                    position: 'relative',
-                    top: 150,
-                    boxShadow: '0 0 8px #cccccc'
-                }} alt="Avatar" src={localUser.user?.avatar}/>
+                <Box top={128} margin='0 auto' position='relative' display="flex" alignItems="center"
+                     justifyContent="center">
+                    <Badge overlap="circular"
+                           anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+                           badgeContent={
+                               <label htmlFor="avatar">
+                                   <input style={{display: 'none'}} onChange={handlePhotoFile}
+                                          accept="image/*" id="avatar" type="file"/>
+                                   <IconButton component="span" sx={{zIndex: 100}}>
+                                       <EditRounded color="primary"/>
+                                   </IconButton>
+                               </label>
+                           }>
+                        <Avatar sx={{
+                            zIndex: 1,
+                            width: 200,
+                            height: 200,
+                            margin: 2,
+                            boxShadow: '0 0 8px #cccccc',
+                        }} alt={localUser.user?.name}
+                                src={localUser.user?.avatar}/>
+                    </Badge>
+                </Box>
 
                 <Paper elevation={0} sx={{
                     width: '70%',
@@ -279,7 +321,7 @@ const Settings = () => {
                 }}>
 
                     <Typography component="div"
-                                sx={{display: 'flex', flexDirection: 'column', textAlign: 'center', mt: 15}}>
+                                sx={{display: 'flex', flexDirection: 'column', textAlign: 'center', mt: 10}}>
                         <Typography variant="h5" component="div">
                             {localUser.user?.name}
                         </Typography>
