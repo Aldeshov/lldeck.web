@@ -143,39 +143,37 @@ const Settings = () => {
         event.preventDefault();
         setSubmitLoading(true);
         setSubmitError(undefined);
-        UserUpdateService(
-            userFormValues.name,
-            userFormValues.email,
-            userFormValues.phoneNumber ? `+${userFormValues.phoneNumber}` : '',
-            userFormValues.oldPassword,
-            userFormValues.newPassword,
-            userFormValues.confirmPassword
-        ).then(() => {
-            const formData = new FormData();
-            formData.append("about", profileFormValues.about);
-            formData.append("selected_theme_mode", profileFormValues.mode.toString());
-            formData.append("selected_language", profileFormValues.language.toString());
-            if (avatar) formData.append("avatar", avatar);
-            ProfileUpdateService(formData)
+        const formData = new FormData();
+        formData.append("name", userFormValues.name);
+        formData.append("email", userFormValues.email);
+        formData.append("phone_number", userFormValues.phoneNumber ? `+${userFormValues.phoneNumber}` : '');
+        formData.append("old_password", userFormValues.oldPassword);
+        formData.append("new_password1", userFormValues.newPassword);
+        formData.append("new_password2", userFormValues.confirmPassword);
+        if (avatar) formData.append("avatar", avatar);
+        UserUpdateService(formData).then(() => {
+            ProfileUpdateService({
+                about: profileFormValues.about,
+                selected_theme_mode: profileFormValues.mode,
+                selected_language: profileFormValues.language,
+            })
                 .then(() => window.location.reload())
-                .catch((error: AxiosError<any>) => {
-                    if (error.response && error.response.data) {
-                        setSubmitError(error.response.data.avatar || error.message)
-                    } else setSubmitError(error.message)
-                })
+                .catch((error: AxiosError<any>) => setSubmitError(error.message))
                 .finally(() => setSubmitLoading(false))
-        }).catch((error: ResponseError) => {
-            if (error.data) {
+        }).catch((error: AxiosError<any>) => {
+            if (error.response && error.response.data) {
+                setSubmitError(error.response.data.avatar || error.message)
+                let data = error.response.data
                 setUserFormValues({
                     ...userFormValues,
-                    nameError: error.data.name,
-                    emailError: error.data.email,
-                    phoneNumberError: error.data.phone_number,
-                    oldPasswordError: error.data.old_password,
-                    newPasswordError: error.data.new_password1,
-                    confirmPasswordError: error.data.new_password2,
+                    nameError: data.name,
+                    emailError: data.email,
+                    phoneNumberError: data.phone_number,
+                    oldPasswordError: data.old_password,
+                    newPasswordError: data.new_password1,
+                    confirmPasswordError: data.new_password2,
                 });
-            } else setSubmitError(error.check ? error.detail() : error.message);
+            } else setSubmitError(error.message);
             setSubmitLoading(false);
         })
     };
