@@ -488,7 +488,7 @@ const Settings = () => {
                         m: '20px 0',
                         gap: 2,
                     }}>
-                    <Box display="flex" flexDirection="row" flexWrap="wrap" alignItems="center" gap={2}>
+                    <Box display="flex" flexDirection="row" flexWrap="wrap" alignItems="center" gap={2} mt={1}>
                         <Typography variant="body1" component="div" sx={{fontWeight: 500}}>
                             Mode:
                         </Typography>
@@ -508,7 +508,7 @@ const Settings = () => {
                         </FormControl>
                     </Box>
 
-                    <Box display="flex" flexDirection="row" flexWrap="wrap" alignItems="center" gap={2}>
+                    <Box display="flex" flexDirection="row" flexWrap="wrap" alignItems="center" gap={2} mt={1}>
                         <Typography variant="body1" component="div" sx={{fontWeight: 500}}>
                             Language:
                         </Typography>

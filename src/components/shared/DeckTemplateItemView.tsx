@@ -15,7 +15,7 @@ const DeckTemplateItemView: FunctionComponent<{ item: DeckTemplateItem }> = ({it
         service.then(() => navigate('/decks'))
             .catch((error) => {
                 setLoading(false);
-                console.log(error);
+                console.error(error);
             })
     }
 
@@ -26,7 +26,7 @@ const DeckTemplateItemView: FunctionComponent<{ item: DeckTemplateItem }> = ({it
             justifyContent: 'center',
             filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
             width: {xs: 256, sm: 192},
-            height: {xs: 192, sm: 130},
+            height: {xs: 170, sm: 130},
             borderRadius: 4,
             p: '20px 10px',
             m: 2
@@ -38,14 +38,14 @@ const DeckTemplateItemView: FunctionComponent<{ item: DeckTemplateItem }> = ({it
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'space-between !important'
+                justifyContent: 'space-around !important'
             }}>
                 <Typography width={180} height={48} fontFamily="Manrope" fontSize="16" fontWeight={500}
                             gutterBottom overflow="hidden" textOverflow="ellipsis"
                             color="primary" component="div">
                     {item.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{fontFamily: 'Manrope'}}>
+                <Typography variant="body2" color="text.secondary" fontFamily='Manrope'>
                     {item.cards_count} words
                 </Typography>
                 <LoadingButton loading={loading} variant='contained' sx={{

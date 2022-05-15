@@ -1,45 +1,37 @@
 import {FunctionComponent, useState} from "react";
-import {Box, Button, Card, CardActionArea, CardContent, Collapse, Divider, Skeleton, Typography} from "@mui/material";
+import {
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardActionArea,
+    CardContent,
+    Collapse,
+    Divider,
+    Skeleton,
+    Typography
+} from "@mui/material";
 import DeckItem from "../../models/api/DeckItem";
 import Deck from "../../models/api/Deck";
 import ResponseError from "../../models/ResponseError";
 import DeckService from "../../services/DeckService";
 import {useNavigate} from "react-router";
 
-interface DeckState {
-    item: Deck;
-    error: string;
-    loading: boolean;
-}
-
 
 const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
     const navigate = useNavigate();
     const [expanded, setExpanded] = useState(false);
-    const [deck, setDeck] = useState<DeckState>({
-        item: {} as Deck,
-        error: "",
-        loading: true
-    });
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const [deck, setDeck] = useState<Deck>();
 
     const handleClick = () => {
         setExpanded(!expanded)
-        if (deck.loading) {
+        if (loading) {
             DeckService(item.id)
-                .then((data: Deck) => {
-                    setDeck({
-                        error: "",
-                        item: data,
-                        loading: false
-                    });
-                })
-                .catch((error: ResponseError) => {
-                    setDeck({
-                        loading: false,
-                        item: {} as Deck,
-                        error: error.data || error.message
-                    });
-                })
+                .then((data: Deck) => setDeck(data))
+                .catch((error: ResponseError) => setError(error.message))
+                .finally(() => setLoading(false))
         }
     }
 
@@ -92,14 +84,25 @@ const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
                     <Collapse in={expanded} timeout="auto" sx={{mt: 2}}>
                         <Divider color="primary" sx={{m: '5px 0'}}/>
                         {
-                            !deck.loading ?
+                            error && <Alert severity="error" sx={{m: 1, overflow: 'scroll'}}>
+                                {error}
+                            </Alert>
+                        }
+                        {
+                            loading ?
                                 <Box>
+                                    <Skeleton animation="wave" height={28}/>
+                                    <Skeleton animation="wave" height={28}/>
+                                    <Skeleton animation="wave" height={28}/>
+                                </Box>
+                                :
+                                deck && <Box>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
                                         <Typography color="primary" variant="body1">
                                             New:
                                         </Typography>
                                         <Typography color="primary" variant="body1">
-                                            {deck.item.daily_new_cards_count} words
+                                            {deck.daily_new_cards_count} words
                                         </Typography>
                                     </Box>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -107,7 +110,7 @@ const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
                                             Learning:
                                         </Typography>
                                         <Typography color="#CF0095" variant="body1">
-                                            {deck.item.learning_cards_count} words
+                                            {deck.learning_cards_count} words
                                         </Typography>
                                     </Box>
                                     <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -115,15 +118,9 @@ const DeckItemView: FunctionComponent<{ item: DeckItem }> = ({item}) => {
                                             To review:
                                         </Typography>
                                         <Typography color="#00A925" variant="body1">
-                                            {deck.item.to_review_cards_count} words
+                                            {deck.to_review_cards_count} words
                                         </Typography>
                                     </Box>
-                                </Box>
-                                :
-                                <Box>
-                                    <Skeleton animation="wave"/>
-                                    <Skeleton animation="wave"/>
-                                    <Skeleton animation="wave"/>
                                 </Box>
                         }
                     </Collapse>

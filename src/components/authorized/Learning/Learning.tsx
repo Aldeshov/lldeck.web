@@ -65,16 +65,16 @@ const Learning = () => {
                             setLearningCards(data);
                             CardLearnService(deckID, "to-review")
                                 .then((data: CardList) => setToReviewCards(data))
-                                .catch((error: ResponseError) => setError(error.detail()))
+                                .catch((error: ResponseError) => setError(error.data ? error.detail() : error.message))
                                 .finally(() => setLoading(false))
                         })
                         .catch((error: ResponseError) => {
-                            setError(error.detail());
+                            setError(error.data ? error.detail() : error.message);
                             setLoading(false);
                         })
                 })
                 .catch((error: ResponseError) => {
-                    setError(error.detail());
+                    setError(error.data ? error.detail() : error.message);
                     setLoading(false);
                 })
         } else {

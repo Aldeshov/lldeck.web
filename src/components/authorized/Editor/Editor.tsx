@@ -307,7 +307,7 @@ const Editor = () => {
                         </Box>
                     </Box>
                 }
-                <Box width="100%" display="flex" flexDirection="row" alignItems="center"
+                <Box width="100%" display="flex" flexDirection="row" alignItems="center" mt={2}
                      justifyContent="space-around">
                     <LoadingButton onClick={handleSubmit} loading={submitted} disabled={!selectedDeck}
                                    variant='contained' sx={{
@@ -392,6 +392,7 @@ const Editor = () => {
                 </Box>
                 <LoadingButton onClick={handleDeckCreateSubmit} loading={submitted} disabled={!newDeckName}
                                variant='contained' sx={{
+                    mt: 2,
                     borderRadius: 60,
                     fontFamily: 'Manrope',
                     padding: {xs: '4px 32px', md: '8px 64px'},
@@ -412,7 +413,7 @@ const Editor = () => {
                     {flipped ? "Back of the card" : "Front of the card"}
                 </Typography>
             </Box>
-            <Box width={640} minHeight={512} maxWidth="90%" marginBottom={5} position="relative">
+            <Box width={640} minHeight={512} maxWidth="90%" marginBottom={5} position="relative" mb={3}>
                 <CardFrontEdit shown={!flipped} cardID={cardID} deckID={deckID} handleData={handleFrontData}
                                showBack={() => setFlipped(true)} errors={frontErrors}/>
                 <CardBackEdit shown={flipped} cardID={cardID} deckID={deckID} handleData={handleBackSubmit}

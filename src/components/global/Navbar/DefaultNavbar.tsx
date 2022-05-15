@@ -18,7 +18,6 @@ import {
     Typography
 } from "@mui/material";
 import {
-    AccountBox,
     AssignmentIndRounded,
     InsertChartRounded,
     KeyboardArrowDown,
@@ -28,6 +27,7 @@ import {
 } from "@mui/icons-material";
 import UserContext from "../../../contexts/UserContext";
 import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
+import {ReactComponent as AccountIcon} from './vectors/AccountIcon.svg';
 import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
 import {SearchInput} from "../../../tools/custom";
@@ -159,16 +159,16 @@ const DefaultNavbar = () => {
                                 <Button disableElevation
                                         onClick={() => navigate('/decks', {replace: true})}
                                         variant="contained"
-                                        startIcon={<AccountBox color="primary"/>}
+                                        startIcon={<AccountIcon style={{transform: 'scale(0.8)'}}/>}
                                         sx={{
                                             my: 2,
                                             display: 'flex',
                                             textTransform: 'none',
                                             color: '#323232',
                                             borderRadius: 25,
-                                            backgroundColor: '#EAECFF',
+                                            backgroundColor: 'white',
                                             '&:hover': {
-                                                backgroundColor: '#d3d6ee',
+                                                backgroundColor: '#EAECFF',
                                             },
                                         }}>
                                     My Decks
@@ -260,7 +260,7 @@ const DefaultNavbar = () => {
                                 width: '100%',
                                 justifyContent: 'center'
                             }}>
-                                <SearchInput sx={{width: '90%'}} placeholder="Search" value={search}
+                                <SearchInput sx={{width: '100%'}} placeholder="Search" value={search}
                                              onChange={(event) => setSearch(event.target.value)}/>
                                 <input type="submit" hidden style={{display: 'none'}}
                                        onClick={(event) => {

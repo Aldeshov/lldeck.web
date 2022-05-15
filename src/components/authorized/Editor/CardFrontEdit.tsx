@@ -6,6 +6,7 @@ import {
     Fade,
     FormControl,
     FormHelperText,
+    IconButton,
     InputLabel,
     OutlinedInput,
     Typography
@@ -173,17 +174,11 @@ const CardFrontEdit: FunctionComponent<{
                     {formErrors.photo}
                 </Typography>
             }
-            <Button variant='contained' sx={{
-                backgroundColor: "#5E6CFF",
-                fontSize: 14,
-                borderRadius: 60,
-                padding: '10px 40px',
-                textTransform: 'none',
-                mt: 2,
-                mb: 1,
-            }} onClick={handleClick} endIcon={<ArrowForwardIosRounded/>}>
-                Next
-            </Button>
+            <Box width="100%" display="flex" alignItems="center" mt={4} justifyContent="flex-end">
+                <IconButton onClick={handleClick} size="large">
+                    <ArrowForwardIosRounded color="primary"/>
+                </IconButton>
+            </Box>
         </CardContent>
     )
 

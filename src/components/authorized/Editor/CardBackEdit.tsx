@@ -7,9 +7,9 @@ import {
     Fade,
     FormControl,
     FormHelperText,
+    IconButton,
     InputLabel,
     OutlinedInput,
-    Stack,
     Typography
 } from "@mui/material";
 import {Add, ArrowBackIosNewRounded, MicNoneRounded} from "@mui/icons-material";
@@ -167,26 +167,19 @@ const CardBackEdit: FunctionComponent<{
                     </Alert>
                 )
             }
-            <Box width="100%" height={64}></Box>
-            <Stack direction="row" spacing={2}>
-                <LoadingButton onClick={() => showFront()} variant='contained' sx={{
-                    backgroundColor: "#5E6CFF",
+            <Box width="100%" display="flex" alignItems="center" mt="20%" justifyContent="center">
+                <IconButton onClick={() => showFront()} sx={{position: 'absolute', left: 48}} size="large">
+                    <ArrowBackIosNewRounded color="primary"/>
+                </IconButton>
+                <LoadingButton onClick={handleSaveOrCreate} loading={actionLoading} variant='contained' sx={{
                     fontSize: 14,
                     borderRadius: 60,
-                    padding: {xs: '4px 20px', md: '10px 40px'},
+                    padding: {xs: '8px 48px', md: '10px 60px'},
                     textTransform: 'none',
-                }} startIcon={<ArrowBackIosNewRounded/>}>
-                    Previous
-                </LoadingButton>
-                <LoadingButton onClick={handleSaveOrCreate} variant='contained' sx={{
-                    fontSize: 14,
-                    borderRadius: 60,
-                    padding: {xs: '6px 40px', md: '10px 60px'},
-                    textTransform: 'none',
-                }} loading={actionLoading} color="success">
+                }}>
                     {back.id ? "Save" : "Create"}
                 </LoadingButton>
-            </Stack>
+            </Box>
         </CardContent>
     )
 
