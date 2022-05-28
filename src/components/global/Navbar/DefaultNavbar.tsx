@@ -8,6 +8,7 @@ import {
     CircularProgress,
     Container,
     Divider,
+    IconButton,
     ListItemIcon,
     ListItemText,
     Menu,
@@ -26,25 +27,21 @@ import {
     SettingsApplicationsRounded
 } from "@mui/icons-material";
 import UserContext from "../../../contexts/UserContext";
-import LogoIcon, {ReactComponent as Logo} from './vectors/Logo.svg';
+import LogoIcon from './vectors/Logo.svg';
 import {ReactComponent as AccountIcon} from './vectors/AccountIcon.svg';
 import {useNavigate} from "react-router";
 import {Link} from "react-router-dom";
-import {SearchInput} from "../../../tools/custom";
 import TokenStore from "../../../stores/TokenStore";
 import APIRequest from "../../../services/APIRequest";
-
 
 const DefaultNavbar = () => {
     const navigate = useNavigate();
     const {localUser} = useContext(UserContext);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
-    const [search, setSearch] = React.useState<string>('');
 
     const handleNotFinished = () => {
         setOpenSnackbar(true);
-        handleCloseUserMenu();
     };
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -79,82 +76,54 @@ const DefaultNavbar = () => {
     };
 
     return (
-        <AppBar elevation={2} position="sticky" sx={{backgroundColor: 'white'}}>
-            <Container maxWidth="lg">
+        <AppBar position="sticky" elevation={0}
+                sx={{backgroundColor: 'white', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.05)'}}>
+            <Container maxWidth={false}>
                 <Toolbar disableGutters sx={{flexWrap: 'wrap'}}>
                     <Typography
                         noWrap
                         component="div"
-                        sx={{flexGrow: !localUser.authorized ? 1 : 0, display: {xs: 'none', md: 'flex'}}}>
+                        sx={{flexGrow: 1, display: 'flex'}}>
                         <Link to="/" replace style={{display: 'flex', justifyContent: 'center'}}>
-                            <Logo/>
-                        </Link>
-                    </Typography>
-
-                    <Typography
-                        noWrap
-                        component="div"
-                        sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
-                        <Link to="/" replace style={{display: 'flex', justifyContent: 'center'}}>
-                            <img src={LogoIcon} alt="logo" height="20"/>
+                            <Box component="img" src={LogoIcon} alt="logo" sx={{height: {xs: 24, sm: 32}}}/>
                         </Link>
                     </Typography>
 
                     {
+                        // Loading animation
                         !localUser.ready && <CircularProgress/>
                     }
 
                     {
-                        !localUser.authorized && localUser.ready && (
-                            <Button
-                                sx={{flexGrow: 0, margin: 1}}
-                                aria-controls="fade-menu"
-                                aria-haspopup="true"
-                                aria-expanded="true"
-                                style={{fontSize: 16, textTransform: 'none'}}
-                                onClick={handleSignIn}>
-                                Sign In
-                            </Button>
-                        )
-                    }
-
-                    {
-                        !localUser.authorized && localUser.ready && (
-                            <Divider orientation="vertical" flexItem sx={{margin: '20px 0'}}/>
-                        )
-                    }
-
-                    {
-                        !localUser.authorized && localUser.ready && (
-                            <Button
-                                sx={{flexGrow: 0, margin: 1}}
-                                aria-controls="fade-menu"
-                                aria-haspopup="true"
-                                aria-expanded="true"
-                                style={{fontSize: 16, textTransform: 'none'}}
-                                onClick={handleSignUp}>
-                                Sign Up
-                            </Button>
-                        )
-                    }
-
-                    {
-                        localUser.authorized && localUser.ready && (
-                            <Box component="form" sx={{flexGrow: 1, ml: 2, display: {xs: 'none', md: 'flex'}}}>
-                                <SearchInput sx={{width: '256px'}} value={search}
-                                             onChange={(event) => setSearch(event.target.value)}
-                                             placeholder="Search"/>
-                                <input type="submit" hidden style={{display: 'none'}}
-                                       onClick={(event) => {
-                                           event.preventDefault();
-                                           navigate('/search?q=' + search, {replace: true})
-                                       }}/>
+                        // Sign in & Sign up buttons
+                        !localUser.user && localUser.ready && (
+                            <Box flexGrow={0} display="flex" flexDirection="row" alignItems="center">
+                                <Button
+                                    sx={{margin: 1}}
+                                    aria-controls="fade-menu"
+                                    aria-haspopup="true"
+                                    aria-expanded="true"
+                                    style={{fontSize: 16, textTransform: 'none'}}
+                                    onClick={handleSignIn}>
+                                    Sign In
+                                </Button>
+                                <Divider orientation="vertical" flexItem sx={{margin: '20px 0'}}/>
+                                <Button
+                                    sx={{margin: 1}}
+                                    aria-controls="fade-menu"
+                                    aria-haspopup="true"
+                                    aria-expanded="true"
+                                    style={{fontSize: 16, textTransform: 'none'}}
+                                    onClick={handleSignUp}>
+                                    Sign Up
+                                </Button>
                             </Box>
                         )
                     }
 
                     {
-                        localUser.authorized && localUser.ready && (
+                        // My Decks button
+                        localUser.user && (
                             <Box sx={{flexGrow: 0, marginRight: 1}}>
                                 <Button disableElevation
                                         onClick={() => navigate('/decks', {replace: true})}
@@ -178,11 +147,13 @@ const DefaultNavbar = () => {
                     }
 
                     {
-                        localUser.authorized && localUser.ready && (
+                        // Profile Avatar button (desktop & mobile)
+                        localUser.user && (
                             <Box sx={{flexGrow: 0}}>
-                                <Tooltip title="Account">
+                                <Tooltip title="Account" sx={{display: {xs: 'none', sm: 'revert'}}}>
                                     <Button onClick={handleOpenUserMenu}
                                             sx={{
+                                                display: {xs: 'none', sm: 'inline-flex'},
                                                 textTransform: 'none',
                                                 color: '#323232',
                                                 padding: '10px 12px',
@@ -194,6 +165,18 @@ const DefaultNavbar = () => {
                                             endIcon={!anchorElUser ? <KeyboardArrowDown/> : <KeyboardArrowUp/>}>
                                         Profile
                                     </Button>
+                                </Tooltip>
+                                <Tooltip title="Account" sx={{display: {xs: 'revert', sm: 'none'}}}>
+                                    <IconButton onClick={handleOpenUserMenu}
+                                                sx={{
+                                                    display: {xs: 'revert', sm: 'none'},
+                                                    color: '#323232',
+                                                    margin: '5px 0',
+                                                }}>
+                                        <Avatar sx={{width: 32, height: 32, border: '2px solid #5E6CFF'}}
+                                                alt={localUser.user ? localUser.user.name : "Profile"}
+                                                src={localUser.user?.avatar}/>
+                                    </IconButton>
                                 </Tooltip>
                                 <Menu
                                     sx={{mt: '45px', width: 256}}
@@ -210,7 +193,11 @@ const DefaultNavbar = () => {
                                     }}
                                     open={Boolean(anchorElUser)}
                                     onClose={handleCloseUserMenu}>
-                                    <MenuItem onClick={handleNotFinished}>
+                                    <MenuItem onClick={() => {
+                                        handleNotFinished();
+                                        handleCloseUserMenu();
+                                        navigate('/settings', {replace: true});
+                                    }}>
                                         <ListItemIcon>
                                             <AssignmentIndRounded color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
@@ -229,7 +216,11 @@ const DefaultNavbar = () => {
                                             Settings
                                         </ListItemText>
                                     </MenuItem>
-                                    <MenuItem onClick={handleNotFinished}>
+                                    <MenuItem onClick={() => {
+                                        handleNotFinished();
+                                        handleCloseUserMenu();
+                                        navigate('/settings', {replace: true});
+                                    }}>
                                         <ListItemIcon>
                                             <InsertChartRounded color="secondary" sx={{width: 20, height: 20}}/>
                                         </ListItemIcon>
@@ -250,30 +241,12 @@ const DefaultNavbar = () => {
                             </Box>
                         )
                     }
-
-                    {
-                        localUser.authorized && localUser.ready && (
-                            <Box component="form" sx={{
-                                flexGrow: 1,
-                                display: {xs: 'flex', md: 'none'},
-                                marginBottom: 2,
-                                width: '100%',
-                                justifyContent: 'center'
-                            }}>
-                                <SearchInput sx={{width: '100%'}} placeholder="Search" value={search}
-                                             onChange={(event) => setSearch(event.target.value)}/>
-                                <input type="submit" hidden style={{display: 'none'}}
-                                       onClick={(event) => {
-                                           event.preventDefault();
-                                           navigate('/search?q=' + search, {replace: true})
-                                       }}/>
-                            </Box>
-                        )
-                    }
                 </Toolbar>
+
                 <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleClose}>
                     <Alert onClose={handleClose} severity="warning" sx={{width: '100%'}} elevation={2}>
-                        This option will be available soon!
+                        Page for this option is not ready yet!
+                        In <strong>Settings</strong> you can see some part of it.
                     </Alert>
                 </Snackbar>
             </Container>

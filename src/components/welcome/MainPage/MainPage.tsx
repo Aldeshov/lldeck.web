@@ -17,14 +17,14 @@ const MainPage = () => {
             <SignIn show={query.get("login") === "1"}/>
             <SignUp show={query.get("register") === "1" && !query.get("login")}/>
 
-            <Stack id="main" alignItems="center" justifyContent="space-around" spacing={8}
+            <Stack id="main" alignItems="center" justifyContent="space-around" spacing={2}
                    sx={{backgroundColor: 'white'}}>
                 <FirstSection/>
                 <SecondSection/>
                 <ThirdSection/>
                 <FourthSection/>
                 <FifthSection/>
-                <Divider flexItem/>
+                <Divider flexItem sx={{mt: "0 !important"}}/>
                 <DefaultFooter/>
             </Stack>
         </React.Fragment>

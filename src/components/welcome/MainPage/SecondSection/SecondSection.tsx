@@ -1,45 +1,27 @@
-import {Box, Button, Typography, useMediaQuery} from '@mui/material';
-import DrawingMini from './vectors/Drawing-2-mini.svg';
+import {Box, Button} from '@mui/material';
+import DrawingMobile from './vectors/Drawing-2Mobile.svg';
 import Drawing from './vectors/Drawing-2.svg';
 import {useNavigate} from "react-router";
 
 
 const SecondSection = () => {
     const navigate = useNavigate();
-    const matches = useMediaQuery('(max-width:1080px)');
 
     return (
-        <Box className="main-section" style={{flexDirection: 'column', justifyContent: 'flex-start'}}>
-            {
-                !matches
-                    ?
-                    <img src={Drawing} style={{width: '90%', maxWidth: 1500, marginTop: 25}}
-                         alt="main page drawing-2"/>
-                    :
-                    <img src={DrawingMini} style={{width: '90%', maxWidth: 1080, margin: 0}}
-                         alt="main page drawing-2 mini"/>
-            }
-            {
-                matches && (
-                    <Typography variant='h6' style={{
-                        maxWidth: '90%', margin: 20, textAlign: 'center', fontWeight: 400,
+        <Box className="main-section" flexDirection='column' justifyContent='flex-start'>
+            <Box component="img" width='90%' maxWidth={1280} src={Drawing} alt="main page drawing-2"
+                 sx={{display: {xs: 'none', md: 'revert'}}}/>
+            <Box component="img" width='95%' src={DrawingMobile} alt="main page drawing-2 mobile"
+                 sx={{display: {xs: 'revert', md: 'none'}}}/>
+
+            <Button onClick={() => navigate('?register=1', {replace: true})} variant='contained'
+                    sx={{
+                        mt: {xs: 2, md: 0},
+                        borderRadius: 60,
+                        padding: {xs: '10px 85px', md: '16px 64px'},
+                        fontSize: {xs: 14, md: 16},
+                        textTransform: 'none'
                     }}>
-                        Achieve the best possible results
-                        <br/>
-                        Step by step study any language.
-                    </Typography>
-                )
-            }
-            <Button onClick={() => {
-                navigate('?register=1', {replace: true})
-            }} variant='contained' style={{
-                marginBottom: 20,
-                borderRadius: 60,
-                padding: '16px 64px',
-                fontSize: 16,
-                marginTop: matches ? 20 : 0,
-                textTransform: 'none'
-            }}>
                 Start to learn
             </Button>
         </Box>

@@ -160,7 +160,7 @@ const CardBackView: FunctionComponent<{ shown: boolean, card: CardItem, deckID: 
                         textAlign: !content ? 'center' : 'revert',
                         verticalAlign: !content ? 'middle' : 'revert',
                         lineHeight: !content ? '480px' : 'revert',
-                        filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                        boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                     }} elevation={0}>
                     {loading ? <CardContentLoadingSkeleton/> : error ?
                         <CardContentError error={error || "Something went wrong"}/> : content || "No content"}

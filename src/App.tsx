@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Route, Routes} from 'react-router';
+import ReactGA from 'react-ga';
 
 import {MainPage} from './components/welcome/MainPage';
 import {DefaultNavbar} from './components/global/Navbar';
@@ -23,26 +24,27 @@ import {Search} from "./components/authorized/Search";
 import TokenStore from "./stores/TokenStore";
 
 const App = () => {
-    const [localUser, setLocalUser] = useState<LocalUser>({ready: false, authorized: false});
+    const TRACKING_ID = process.env.REACT_APP_MEASUREMENT_ID || '';
+    const [localUser, setLocalUser] = useState<LocalUser>({ready: false});
     const userState = useMemo(() => ({localUser: localUser, setLocalUser: setLocalUser}), [localUser]);
+
+    ReactGA.initialize(TRACKING_ID);
+    ReactGA.pageview(window.location.pathname);
+
+    const clear = () => {
+        setLocalUser({ready: true});
+        TokenStore.delete();
+    }
 
     useEffect(() => {
         if (!localUser.ready) {
             UserService()
                 .then((user: User) => {
                     ProfileService()
-                        .then((profile: Profile) => {
-                            setLocalUser({ready: true, authorized: true, user: user, profile: profile});
-                        })
-                        .catch(() => {
-                            setLocalUser({ready: true, authorized: false});
-                            TokenStore.delete();
-                        })
+                        .then((profile: Profile) => setLocalUser({ready: true, user, profile}))
+                        .catch(() => clear())
                 })
-                .catch(() => {
-                    setLocalUser({ready: true, authorized: false});
-                    TokenStore.delete();
-                })
+                .catch(() => clear())
         }
     }, [localUser]);
 
@@ -51,12 +53,12 @@ const App = () => {
             <UserContext.Provider value={userState}>
                 <DefaultNavbar/>
                 <Routes>
-                    {localUser.ready && <Route path="/" element={localUser.authorized ? <DeckBrowser/> : <MainPage/>}/>}
-                    {localUser.ready && localUser.authorized && <Route path="/decks" element={<MyDecks/>}/>}
-                    {localUser.ready && localUser.authorized && <Route path="/settings" element={<Settings/>}/>}
-                    {localUser.ready && localUser.authorized && <Route path="/learning/:deckID" element={<Learning/>}/>}
-                    {localUser.ready && localUser.authorized && <Route path="/editor" element={<Editor/>}/>}
-                    {localUser.ready && localUser.authorized && <Route path="/search" element={<Search/>}/>}
+                    {localUser.ready && <Route path="/" element={localUser.user ? <DeckBrowser/> : <MainPage/>}/>}
+                    {localUser.ready && localUser.user && <Route path="/decks" element={<MyDecks/>}/>}
+                    {localUser.ready && localUser.user && <Route path="/settings" element={<Settings/>}/>}
+                    {localUser.ready && localUser.user && <Route path="/learning/:deckID" element={<Learning/>}/>}
+                    {localUser.ready && localUser.user && <Route path="/editor" element={<Editor/>}/>}
+                    {localUser.ready && localUser.user && <Route path="/search" element={<Search/>}/>}
 
                     {
                         localUser.ready ? <Route path="/*" element={<NotFound/>}/> :

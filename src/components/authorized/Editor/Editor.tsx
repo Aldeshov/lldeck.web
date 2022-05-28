@@ -205,7 +205,7 @@ const Editor = () => {
             left: '50%',
             position: 'absolute',
             transform: 'translate(-50%, -50%)',
-            filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+            boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
             borderRadius: 4,
             display: 'flex',
             alignItems: 'center',
@@ -297,10 +297,10 @@ const Editor = () => {
                             <Typography variant="body2">
                                 {selectedDeck.cards_count} words
                             </Typography>
-                            <Box mt={1} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
+                            <Box mt={1} display="flex" flexDirection="row" flexWrap="wrap">
                                 {
                                     selectedDeck.tags.slice(0, 5).map((item, index) => (
-                                        <Chip size="small" color="success" key={index} label={item.name}/>
+                                        <Chip size="small" color="success" key={index} label={item.name} sx={{m: 1}}/>
                                     ))
                                 }
                             </Box>
@@ -337,7 +337,7 @@ const Editor = () => {
             left: '50%',
             position: 'absolute',
             transform: 'translate(-50%, -50%)',
-            filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+            boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
             borderRadius: 4,
             display: 'flex',
             alignItems: 'center',

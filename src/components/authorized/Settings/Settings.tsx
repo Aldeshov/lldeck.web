@@ -75,7 +75,7 @@ const Settings = () => {
             setProfileStatusError(undefined)
             ProfileStatusService()
                 .then((data: ProfileStatus) => setProfileStatus(data))
-                .catch((error: ResponseError) => setProfileStatusError(error.check ? error.detail() : error.message))
+                .catch((error: ResponseError) => setProfileStatusError(error.data ? error.detail() : error.message))
                 .finally(() => setProfileStatusLoading(false))
         }
     }, [profileStatus]);
@@ -188,7 +188,7 @@ const Settings = () => {
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 justifyContent: 'space-around',
-                filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
             }}>
                 <Box sx={{display: 'flex', alignItems: 'center', margin: 1}}>
                     <Badge
@@ -315,7 +315,7 @@ const Settings = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'space-around',
-                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                 }}>
 
                     <Typography component="div"
@@ -509,6 +509,8 @@ const Settings = () => {
                         <OutlinedInput
                             type="text"
                             id="aboutInput"
+                            rows={4}
+                            multiline
                             value={profileFormValues.about}
                             inputProps={{'aria-label': 'weight'}}
                             onChange={(event) => setProfileFormValues({
@@ -600,7 +602,7 @@ const Settings = () => {
                     left: '50%',
                     position: 'absolute',
                     transform: 'translate(-50%, -50%)',
-                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                     borderRadius: 4,
                     display: 'flex',
                     alignItems: 'center',

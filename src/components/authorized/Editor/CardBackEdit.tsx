@@ -64,7 +64,7 @@ const CardBackEdit: FunctionComponent<{
             setError(undefined)
             CardContentService(deckID, cardID, "back")
                 .then((data: CardBack) => setBack(data))
-                .catch((error: ResponseError) => setError(error.check ? error.detail() : error.message))
+                .catch((error: ResponseError) => setError(error.data ? error.detail() : error.message))
                 .finally(() => setLoading(false))
         } else {
             setLoading(false);
@@ -194,7 +194,7 @@ const CardBackEdit: FunctionComponent<{
                     textAlign: !content ? 'center' : 'revert',
                     verticalAlign: !content ? 'middle' : 'revert',
                     lineHeight: !content ? '480px' : 'revert',
-                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                 }} elevation={0}>
                 {loading ? <CardContentLoading/> : error ?
                     <CardContentError error={error || "Something went wrong"}/> : content || "No content"}

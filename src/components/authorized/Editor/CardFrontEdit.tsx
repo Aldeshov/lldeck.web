@@ -70,7 +70,7 @@ const CardFrontEdit: FunctionComponent<{
             setError(undefined)
             CardContentService(deckID, cardID, "front")
                 .then((data: CardFront) => setFront(data))
-                .catch((error: ResponseError) => setError(error.check ? error.detail() : error.message))
+                .catch((error: ResponseError) => setError(error.data ? error.detail() : error.message))
                 .finally(() => setLoading(false))
         } else {
             setLoading(false);
@@ -193,7 +193,7 @@ const CardFrontEdit: FunctionComponent<{
                     textAlign: !content ? 'center' : 'revert',
                     verticalAlign: !content ? 'middle' : 'revert',
                     lineHeight: !content ? '480px' : 'revert',
-                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                 }} elevation={0}>
                 {
                     loading ? <CardContentLoading/> :

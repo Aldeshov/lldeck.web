@@ -6,15 +6,15 @@ import ResponseError from "../../../models/ResponseError";
 import DeckListService from "../../../services/DeckListService";
 import HorizontalDeckListView from "../../shared/HorizontalDeckListView";
 import {useNavigate} from "react-router";
+import DataState from "../../../models/DataState";
 
-interface DeckListState {
-    list: DeckList;
-    error: string;
-    loading: boolean;
-}
 
 const MyDecks = () => {
     const navigate = useNavigate();
+    const [favoriteDecks, setFavoriteDecks] = useState<DataState<DeckList>>({loading: true});
+    const [downloadedDecks, setDownloadedDecks] = useState<DataState<DeckList>>({loading: true});
+    const [createdDecks, setCreatedDecks] = useState<DataState<DeckList>>({loading: true});
+
     const DeckListPlaceHolder = (
         <Stack direction="row" flexWrap="wrap" spacing={0}
                sx={{m: 3, justifyContent: {xs: 'center', md: 'flex-start'}}}>
@@ -22,80 +22,35 @@ const MyDecks = () => {
         </Stack>
     )
 
-    const [favoriteDecks, setFavoriteDecks] = useState<DeckListState>({
-        list: {} as DeckList,
-        error: "",
-        loading: true
-    });
-
-    const [downloadedDecks, setDownloadedDecks] = useState<DeckListState>({
-        list: {} as DeckList,
-        error: "",
-        loading: true
-    });
-
-    const [createdDecks, setCreatedDecks] = useState<DeckListState>({
-        list: {} as DeckList,
-        error: "",
-        loading: true
-    });
-
     useEffect(() => {
         DeckListService({favorite: 1})
-            .then((data: DeckList) => {
-                setFavoriteDecks({
-                    error: "",
-                    list: data,
-                    loading: false
-                });
-            })
-            .catch((error: ResponseError) => {
-                setFavoriteDecks({
-                    loading: false,
-                    list: {} as DeckList,
-                    error: error.data || error.message
-                });
-            })
+            .then((data: DeckList) => setFavoriteDecks({...favoriteDecks, data: data, loading: false}))
+            .catch((error: ResponseError) => setFavoriteDecks({...favoriteDecks, error: error.message, loading: false}))
             .finally(() => {
                 DeckListService({template: 1})
-                    .then((data: DeckList) => {
-                        setDownloadedDecks({
-                            error: "",
-                            list: data,
-                            loading: false
-                        });
-                    })
-                    .catch((error: ResponseError) => {
-                        setDownloadedDecks({
-                            loading: false,
-                            list: {} as DeckList,
-                            error: error.data || error.message
-                        });
-                    })
+                    .then((data: DeckList) => setDownloadedDecks({...downloadedDecks, data: data, loading: false}))
+                    .catch((error: ResponseError) => setDownloadedDecks({
+                        ...downloadedDecks,
+                        error: error.message,
+                        loading: false
+                    }))
                     .finally(() => {
                         DeckListService({template: 0})
-                            .then((data: DeckList) => {
-                                setCreatedDecks({
-                                    error: "",
-                                    list: data,
-                                    loading: false
-                                });
-                            })
-                            .catch((error: ResponseError) => {
-                                setCreatedDecks({
-                                    loading: false,
-                                    list: {} as DeckList,
-                                    error: error.data || error.message
-                                });
-                            })
+                            .then((data: DeckList) => setCreatedDecks({...createdDecks, data: data, loading: false}))
+                            .catch((error: ResponseError) => setCreatedDecks({
+                                ...createdDecks,
+                                error: error.message,
+                                loading: false
+                            }))
                     })
             })
     }, []);
 
     return (
         <Stack direction="column" spacing={0}>
-            <Container maxWidth="lg" sx={{mt: 3}}>
-                <Box display="flex" flexWrap="wrap" flexDirection="row" justifyContent="space-between">
+            <Container maxWidth={false} sx={{mt: 3}}>
+                <Box display="flex" flexWrap="wrap" flexDirection="row" justifyContent="space-between"
+                sx={{m: {xs: '0 20px', md: '0 40px'}}}>
                     <Box>
                         <Typography variant="h5" fontWeight={500}>
                             My Decks
@@ -104,10 +59,11 @@ const MyDecks = () => {
                             Please choose what you want to learn!
                         </Typography>
                     </Box>
+
                     <Button variant='contained' sx={{
                         m: {xs: '20px auto', sm: 'revert'},
                         backgroundColor: "#5E6CFF",
-                        fontSize: 18,
+                        fontSize: {xs: 14, sm: 18},
                         borderRadius: 60,
                         padding: {xs: '8px 64px', sm: '0 40px'},
                         textTransform: 'none',
@@ -116,6 +72,7 @@ const MyDecks = () => {
                     </Button>
                 </Box>
             </Container>
+
             <Container maxWidth={false} sx={{m: "20px 0 10px", backgroundColor: "#E9F4FE"}}>
                 <Typography component="div" fontFamily="Manrope" fontSize={18}
                             fontWeight={500} margin="20px 40px 0">
@@ -123,9 +80,10 @@ const MyDecks = () => {
                 </Typography>
                 {
                     favoriteDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView list={favoriteDecks.list} error={favoriteDecks.error}/>
+                        <HorizontalDeckListView list={favoriteDecks.data} error={favoriteDecks.error}/>
                 }
             </Container>
+
             <Container maxWidth={false} sx={{m: "20px 0 10px", backgroundColor: "#F5E9FF"}}>
                 <Typography component="div" fontFamily="Manrope" fontSize={18}
                             fontWeight={500} margin="20px 40px 0">
@@ -133,9 +91,10 @@ const MyDecks = () => {
                 </Typography>
                 {
                     downloadedDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView list={downloadedDecks.list} error={downloadedDecks.error}/>
+                        <HorizontalDeckListView list={downloadedDecks.data} error={downloadedDecks.error}/>
                 }
             </Container>
+
             <Container maxWidth={false} sx={{m: "20px 0 10px", backgroundColor: "#FFF0F0"}}>
                 <Typography component="div" fontFamily="Manrope" fontSize={18}
                             fontWeight={500} margin="20px 40px 0">
@@ -143,7 +102,7 @@ const MyDecks = () => {
                 </Typography>
                 {
                     createdDecks.loading ? DeckListPlaceHolder :
-                        <HorizontalDeckListView list={createdDecks.list} error={createdDecks.error}/>
+                        <HorizontalDeckListView list={createdDecks.data} error={createdDecks.error}/>
                 }
             </Container>
         </Stack>

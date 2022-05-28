@@ -1,34 +1,26 @@
-import {Box, Container, Typography, useMediaQuery} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import Drawing from './vectors/Drawing-4.svg';
 
 
 const FourthSection = () => {
-    const matches = useMediaQuery('(max-width:1256px)');
-
     return (
         <Box className="main-section wrap-reversed">
-            <Container maxWidth="sm" style={{margin: !matches ? 25 : 5}}>
-                {
-                    !matches
-                        ?
-                        <h1 style={{fontWeight: 700}}>Your next success is not far off.</h1>
-                        :
-                        <h2 style={{fontWeight: 700, color: '#4D5DFD', textAlign: 'center'}}>Your next success is not
-                            far off.</h2>
-                }
-                <br/>
-                <Typography variant={!matches ? 'h5' : 'h6'}
-                            style={{
-                                fontWeight: 400,
-                                maxWidth: !matches ? 555 : '100%',
-                                textAlign: matches ? 'center' : 'unset'
-                            }}>
+            <Box display='flex' flexDirection='column' sx={{width: {xs: '75%', md: '40%'}}} p={1}
+                 minWidth={256} maxWidth={640}>
+                <Typography color="#323232" sx={{fontSize: {xs: 24, md: 38}}} lineHeight={1}
+                            mb={4} fontWeight={700}>
+                    Your next success is not far off.
+                </Typography>
+
+                <Typography sx={{fontSize: {xs: 15, md: 22}}} mb={2}
+                            fontWeight={400} color="#525252">
                     Each new fact that you remember is an achievement. LLDeck breaks new material on the part to
                     facilitate memorization and make mastering the material in the phased.
                 </Typography>
-            </Container>
-            <img src={Drawing} style={{width: matches ? '90%' : '45%', maxWidth: 512, margin: 25}}
-                 alt="main page drawing-1"/>
+            </Box>
+
+            <Box component="img" src={Drawing} alt="main page drawing-4" minWidth={256} maxWidth={512} pl={4} pr={4}
+                 sx={{width: {xs: '90%', md: '40%'}, pb: {xs: 2, md: 0}}}/>
         </Box>
     )
 }

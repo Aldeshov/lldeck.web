@@ -89,7 +89,7 @@ const Learning = () => {
             ProfileUpdateService({aim: newAim})
                 .then(() => window.location.reload())
                 .catch((error: ResponseError) => setNewAimError(
-                    error.check ? (error.data && error.data.aim) : error.message
+                    error.data ? error.data.aim : error.message
                 ))
                 .finally(() => setSubmitted(false))
         }
@@ -246,7 +246,7 @@ const Learning = () => {
                     left: '50%',
                     position: 'absolute',
                     transform: 'translate(-50%, -50%)',
-                    filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
+                    boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
                     borderRadius: 4,
                     display: 'flex',
                     alignItems: 'center',

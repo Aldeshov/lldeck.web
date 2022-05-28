@@ -10,7 +10,7 @@ export const SearchInput = styled(InputBase)(({theme}) => ({
     '& .MuiInputBase-input': {
         borderRadius: 25,
         position: 'relative',
-        backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#2b2b2b',
+        // backgroundColor: theme.palette.mode === 'light' ? '#ffffff' : '#2b2b2b',
         backgroundImage: `url(${SearchIcon})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: '15px 15px',
@@ -97,11 +97,10 @@ export const DeckItemSkeleton = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                filter: 'drop-shadow(0px 10px 9px rgba(0, 0, 0, 0.04))',
-                width: {xs: 256, sm: 192},
-                height: {xs: 192, sm: 130},
+                boxShadow: '0px 10px 9px rgba(0, 0, 0, 0.04)',
+                width: {xs: 185, sm: 225},
+                height: {xs: 218, sm: 178},
                 borderRadius: 4,
-                p: '20px 10px',
                 m: 2
             }}
             elevation={0}>
